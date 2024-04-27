@@ -12,9 +12,7 @@ A rendszert ket nagy reszre osszuk logikai szempontbol: **cegek modul es kliens 
 **Cegek modul**
 
     A ceg fel tud regisztralni a platformra, amennyiben kitolti a kotelezo ceges adatokat.
-    
     A ceg felregisztralasakor letrejon egy Admin felhasznalo is, aki ezutan email cim es jelszo alapjan barmikor be tud jelentkezni az aplikacioba
-    
     A felhasznaloknak van “Elfelejtettem a jelszavam” lehetoseguk is, amely altal ujra tudjak allitani a jelszavukat
     Bejelentkezes utan az admin felhasznalo egy “Dashboardot” lat a legrelevansabb informaciokkal, mint peldaul projektek, felhasznalok, ujdonsagok
     Az admin felhasznalo meg tudja hivni a kollegait a feluletre, akik egy email ertesitesen keresztul aktivalni tudjak a felhasznaloikat es be tudnak jelentkezni.
@@ -26,6 +24,7 @@ A rendszert ket nagy reszre osszuk logikai szempontbol: **cegek modul es kliens 
     A ceg munkatarsai tudjak modositani a feladat allapotat: folyamatban/befejezve, stb.
     
 **Kliens modul**
+
     A kliens az emailes meghivoban szereplo utasitasok alapjan tudja aktivalni felhasznalojat
     A kliens bejelentkezes utan meg tudja nezni a projekteket amikhez hozza lett adva a feluleten keresztul
     A kliens be tud lepni egy projekt belso oldalara, ahol eler minden informaciot a projektrol, hozzafer es fel tud tolteni dokumentumokat, tud uj temakat nyitni es letre tud hozni feladatokat
