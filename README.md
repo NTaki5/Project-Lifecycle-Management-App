@@ -8,9 +8,13 @@ Egy web alapu alkalmazasrol van szo, hogy barki szamara elerheto legyen anelkul,
 A rendszert ket nagy reszre osszuk logikai szempontbol: **cegek modul es kliens modul**.
 
 **Funkció lista**
+
 **Cegek modul**
+
     A ceg fel tud regisztralni a platformra, amennyiben kitolti a kotelezo ceges adatokat.
+    
     A ceg felregisztralasakor letrejon egy Admin felhasznalo is, aki ezutan email cim es jelszo alapjan barmikor be tud jelentkezni az aplikacioba
+    
     A felhasznaloknak van “Elfelejtettem a jelszavam” lehetoseguk is, amely altal ujra tudjak allitani a jelszavukat
     Bejelentkezes utan az admin felhasznalo egy “Dashboardot” lat a legrelevansabb informaciokkal, mint peldaul projektek, felhasznalok, ujdonsagok
     Az admin felhasznalo meg tudja hivni a kollegait a feluletre, akik egy email ertesitesen keresztul aktivalni tudjak a felhasznaloikat es be tudnak jelentkezni.
