@@ -3,7 +3,7 @@
 
 Az applikacio egy olyan felulet ami lehetoseget biztosit felregisztralo cegeknek, hogy projekteket hozzanak letre es hogy meghivjak a projekthez tartozo klienseket a feluletre. Ezaltal letrejon egy “szoba” a ceg es a kliens kozott, amely elosegiti a kommunikaciot, a relevans dokumentumok tarolasat es az ugyfelszolgalati folyamatokat.
 
-Egy web alapu alkalmazasrol van szo, hogy barki szamara elerheto legyen anelkul, hogy valamit le kellene tolteni. Javasolt technologiak: Angular 15, Java Spring Boot, PostgreSQL Adatbazis
+Egy web alapu alkalmazasrol van szo, hogy barki szamara elerheto legyen anelkul, hogy valamit le kellene tolteni. Javasolt technologiak: PHP, HTML5, SQL DB.
 
 A rendszert ket nagy reszre osszuk logikai szempontbol: **cegek modul es kliens modul**.
 
