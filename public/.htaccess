@@ -1,0 +1,15 @@
+RewriteEngine On
+
+#redirects any request to the HTTPS version of the same URL
+#RewriteCond %{HTTPS} off
+#RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+RewriteCond %{REQUEST_FILENAME} !-d
+#checks if the requested filename is not a directory
+
+RewriteCond %{REQUEST_FILENAME} !-f
+#checks if the requested filename is not a regular file
+
+RewriteCond %{REQUEST_FILENAME} !-l
+#checks if the requested filename is not a symbolic link
+
+RewriteRule ^(.*)$ index.php?url=$1 [NC,L,QSA]
