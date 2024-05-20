@@ -1,6 +1,7 @@
 <?php
 
 require "config.php";
+require "functions.php";
 require "database.php";
 require "controller.php";
 require "app.php";
@@ -10,5 +11,6 @@ require "model.php";
 // for example in controllers/Home.php => $user = new User(); this function is called
 // and require the models/User.php file
 spl_autoload_register(function($class_name){
-    require "../private/models/" . ucfirst($class_name) . ".php";
+    if(file_exists("../private/models/" . ucfirst($class_name) . ".php"))
+        require "../private/models/" . ucfirst($class_name) . ".php";
 });

@@ -2,7 +2,7 @@
     $this->view("/includes/header");
 ?>
 
-<h2 class="w-100">Home Page</h2>
+<h2 class="norbi">Home Page</h2>
 
 <?php
 echo '<pre>';
