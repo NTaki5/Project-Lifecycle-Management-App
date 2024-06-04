@@ -165,81 +165,9 @@
                 <h5 class="mb-0 fs-5 p-1">Quick Page Links</h5>
                 <ul class="list mb-0 py-2">
                     <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Analytics</span>
-                            <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard1</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">eCommerce</span>
-                            <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard2</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">CRM</span>
-                            <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard3</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Contacts</span>
-                            <span class="fs-2 d-block text-body-secondary">/apps/contacts</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Posts</span>
-                            <span class="fs-2 d-block text-body-secondary">/apps/blog/posts</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Detail</span>
-                            <span class="fs-2 d-block text-body-secondary">/apps/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Shop</span>
-                            <span class="fs-2 d-block text-body-secondary">/apps/ecommerce/shop</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Modern</span>
-                            <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard1</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Dashboard</span>
-                            <span class="fs-2 d-block text-body-secondary">/dashboards/dashboard2</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Contacts</span>
-                            <span class="fs-2 d-block text-body-secondary">/apps/contacts</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Posts</span>
-                            <span class="fs-2 d-block text-body-secondary">/apps/blog/posts</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Detail</span>
-                            <span class="fs-2 d-block text-body-secondary">/apps/blog/detail/streaming-video-way-before-it-was-cool-go-dark-tomorrow</span>
-                        </a>
-                    </li>
-                    <li class="p-1 mb-1 bg-hover-light-black rounded px-2">
-                        <a href="javascript:void(0)">
-                            <span class="text-dark fw-semibold d-block">Shop</span>
-                            <span class="fs-2 d-block text-body-secondary">/apps/ecommerce/shop</span>
+                        <a href="accountSettings">
+                            <span class="text-dark fw-semibold d-block">Account Settings</span>
+                            <span class="fs-2 d-block text-body-secondary">/public/accountSettings</span>
                         </a>
                     </li>
                 </ul>
@@ -252,18 +180,21 @@
 <div class="dark-transparent sidebartoggler"></div>
 
   <!-- Import Js Files -->
+  <script src="assets/js/vendor.min.js"></script>
   <script src="assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="assets/libs/simplebar/dist/simplebar.min.js"></script>
-  <script src="assets/js/theme/app.init.js"></script>
-  <script src="assets/js/theme/theme.js"></script>
-  <script src="assets/js/theme/app.min.js"></script>
-  <script src="assets/js/theme/sidebarmenu.js"></script>
+  <script src="assets/js/app/app.init.js"></script>
+  <script src="assets/js/app/theme.js"></script>
+  <script src="assets/js/app/app.min.js"></script>
+  <script src="assets/js/app/sidebarmenu.js"></script>
 
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
   <script src="assets/libs/apexcharts/dist/apexcharts.min.js"></script>
   <script src="assets/js/dashboards/dashboard1.js"></script>
   <script src="assets/libs/fullcalendar/index.global.min.js"></script>
+  <script src="assets/js/apps/team.js"></script>
+  <script src="assets/js/dashboards/my-dashboard.js"></script>
 
 </body>
 

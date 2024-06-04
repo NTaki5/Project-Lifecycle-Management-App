@@ -14,10 +14,11 @@
   <!-- Core Css -->
   <link rel="stylesheet" href="<?= ROOT ?>/assets/css/styles.css" />
 
-  <title>PLM Admin</title>
+  <title>Project Lifecycle Managemenet</title>
 </head>
 
 <body>
+<?php if(isset($toast)) echo $toast;?>
   <!-- Preloader -->
   <div class="preloader">
     <img src="<?= ROOT ?>/assets/images/logos/logo.png" alt="loader" class="lds-ripple img-fluid" />
@@ -57,16 +58,16 @@
                 </div>
                 <form method="POST">
                   <div class="mb-3">
-                    <label for="inputEmail" class="form-label">Email</label>
+                    <label for="inputEmail" class="form-label">Email or Username</label>
                     <input type="text" value="<?= get_var("email") ?>" class="form-control" name="email" id="inputEmail" />
                   </div>
-                  <div class="mb-4 position-relative">
+                  <div class="mb-2 position-relative">
                     <label for="inputPassword" class="form-label">Password</label>
                     <input type="password" value="<?= get_var("password") ?>" name="password" class="form-control" id="inputPassword" />
                     <i class="bi bi-eye-slash" id="togglePassword"></i>
-                  <div class="invalid-feedback">
-                    <?php echo isset($errors["emailOrPassword"]) ? $errors["emailOrPassword"] : "" ?>
                   </div>
+                  <div class="invalid-feedback mt-2 mb-4">
+                    <?php echo isset($errors["emailOrPassword"]) ? $errors["emailOrPassword"] : "" ?>
                   </div>
                   <div class="d-sm-flex align-items-center justify-content-between mb-4">
                     <div class="form-check">
@@ -117,16 +118,15 @@
   <!-- Import Js Files -->
   <script src="<?= ROOT ?>/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
   <script src="<?= ROOT ?>/assets/libs/simplebar/dist/simplebar.min.js"></script>
-  <script src="<?= ROOT ?>/assets/js/theme/app.init.js"></script>
-  <script src="<?= ROOT ?>/assets/js/theme/theme.js"></script>
-  <script src="<?= ROOT ?>/assets/js/theme/app.min.js"></script>
-  <script src="<?= ROOT ?>/assets/js/theme/sidebarmenu.js"></script>
+  <script src="<?= ROOT ?>/assets/js/app/app.init.js"></script>
+  <script src="<?= ROOT ?>/assets/js/app/theme.js"></script>
+  <script src="<?= ROOT ?>/assets/js/app/app.min.js"></script>
+  <script src="<?= ROOT ?>/assets/js/app/sidebarmenu.js"></script>
 
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
   <script defer>
-    const togglePassword = document
-      .querySelector('#togglePassword');
+    const togglePassword = document.querySelector('#togglePassword');
 
     togglePassword.addEventListener('click', () => {
       // Toggle the type attribute using

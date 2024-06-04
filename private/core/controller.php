@@ -3,7 +3,6 @@
 // main controller class
 
 class Controller{
-
     public function view($view, $data = array()){
 
         // for example $data["user_name"] is extracted into $user_name variable
@@ -28,4 +27,5 @@ class Controller{
     public function redirect($link){
         header("Location: " . ROOT . "/" . trim($link, "/"));
     }
+
 }

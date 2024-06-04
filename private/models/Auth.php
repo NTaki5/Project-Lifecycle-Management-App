@@ -20,9 +20,9 @@ class Auth{
     // is CALLED, when the Auth::someFunction not exist
     // I use it for get functions, example getUsername -> return $_SESSION['USER']->username;
     public static function __callStatic($method, $args){
-        $userProperty = strtolower(str_replace('get','',$method));
+        $userProperty = lcfirst(str_replace('get','',$method));
         if(isset($_SESSION['USER']->$userProperty))
             return $_SESSION['USER']->$userProperty;
-        return 'No data models/Auth';
+        return null;
     }
 }

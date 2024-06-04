@@ -17303,7 +17303,7 @@
 [data-bs-theme=dark] .dropdown-item:hover,
 [data-bs-theme=dark] .form-control:disabled,
 [data-bs-theme=dark] .theme-tab.nav-tabs .nav-item .nav-link {
-    background-color: var(--brown-color) !important
+    background-color: var(--brown-color-light) !important
 }
 
 [data-bs-theme=dark] .app-chat-offcanvas,
@@ -17579,8 +17579,8 @@
 [data-bs-theme=light][data-color-theme=Blue_Theme]:root {
     --bs-primary: var(--brown-color);
     --bs-primary-rgb: 71, 43, 41;
-    --bs-secondary: #14E9E2;
-    --bs-secondary-rgb: 20, 233, 226
+    --bs-primary-rgb: 71, 43, 41;
+    --bs-secondary-rgb: 136, 174, 69;
 }
 
 [data-bs-theme=light][data-color-theme=Blue_Theme]:root .btn-primary {
@@ -17591,10 +17591,10 @@
 }
 
 [data-bs-theme=light][data-color-theme=Blue_Theme]:root .btn-secondary {
-    --bs-btn-bg: #14E9E2;
-    --bs-btn-border-color: #14E9E2;
-    --bs-btn-hover-bg: #0dcbc5;
-    --bs-btn-hover-border-color: #0dcbc5
+    --bs-btn-bg: var(--green-color);
+    --bs-btn-border-color: var(--green-color);
+    --bs-btn-hover-bg: var(--green-color-light);
+    --bs-btn-hover-border-color: var(--green-color-light)
 }
 
 [data-bs-theme=dark][data-color-theme=Aqua_Theme]:root,
@@ -17768,7 +17768,7 @@
     --bs-gray-800: #343a40;
     --bs-gray-900: #212529;
     --bs-primary: var(--brown-color);
-    --bs-secondary: #14e9e2;
+    --bs-secondary: var(--green-color);
     --bs-success: #36c76c;
     --bs-info: #46caeb;
     --bs-warning: #ffd648;
@@ -17778,8 +17778,8 @@
     --bs-muted: #526b7a;
     --bs-indigo: #6610f2;
     --bs-light-indigo: #ebf3fe;
-    --bs-primary-rgb: var(--brown-color);
-    --bs-secondary-rgb: 20, 233, 226;
+    --bs-primary-rgb: 71, 43, 41;
+    --bs-secondary-rgb: 136, 174, 69;
     --bs-success-rgb: 54, 199, 108;
     --bs-info-rgb: 70, 202, 235;
     --bs-warning-rgb: 255, 214, 72;
@@ -21201,7 +21201,7 @@ textarea.form-control-lg {
 }
 
 .valid-feedback {
-    display: none;
+    /* display: none; */
     width: 100%;
     margin-top: .25rem;
     font-size: .875em;
@@ -21464,8 +21464,8 @@ textarea.form-control.is-invalid {
 
 .btn:hover {
     color: var(--bs-btn-hover-color);
-    background-color: var(--bs-btn-hover-bg);
-    border-color: var(--bs-btn-hover-border-color)
+    background-color: var(--green-color);
+    border-color: var(--green-color);
 }
 
 .btn-check+.btn:hover {
@@ -21476,14 +21476,14 @@ textarea.form-control.is-invalid {
 
 .btn:focus-visible {
     color: var(--bs-btn-hover-color);
-    background-color: var(--bs-btn-hover-bg);
-    border-color: var(--bs-btn-hover-border-color);
+    background-color: var(--green-color);
+    border-color: var(--green-color);
     outline: 0;
     box-shadow: var(--bs-btn-box-shadow), var(--bs-btn-focus-box-shadow)
 }
 
 .btn-check:focus-visible+.btn {
-    border-color: var(--bs-btn-hover-border-color);
+    border-color: var(--green-color);
     outline: 0;
     box-shadow: var(--bs-btn-box-shadow), var(--bs-btn-focus-box-shadow)
 }
@@ -22283,6 +22283,10 @@ fieldset:disabled .btn {
 .dropdown-item:hover {
     color: var(--bs-dropdown-link-hover-color);
     background-color: var(--bs-dropdown-link-hover-bg)
+}
+
+[data-bs-theme=dark] .dropdown-item:hover{
+    color: var(--green-color);
 }
 
 .dropdown-item.active,
@@ -26065,6 +26069,11 @@ fieldset:disabled .btn {
     background-color: RGBA(var(--bs-light-indigo-rgb), var(--bs-bg-opacity, 1)) !important
 }
 
+.data-bg-color{
+    /* --bg-color: attr(data-bgcolor); */
+    background-color: rgb(var(--bg-color));
+}
+
 .link-primary {
     color: RGBA(var(--bs-primary-rgb), var(--bs-link-opacity, 1)) !important;
     text-decoration-color: RGBA(var(--bs-primary-rgb), var(--bs-link-underline-opacity, 1)) !important
@@ -26072,8 +26081,8 @@ fieldset:disabled .btn {
 
 .link-primary:focus,
 .link-primary:hover {
-    color: RGBA(79, 73, 204, var(--bs-link-opacity, 1)) !important;
-    text-decoration-color: RGBA(79, 73, 204, var(--bs-link-underline-opacity, 1)) !important
+    color: var(--brown-color-light) !important;
+    text-decoration-color: var(--brown-color-light) !important
 }
 
 .link-secondary {
@@ -36277,7 +36286,7 @@ body {
 }
 
 .body-wrapper {
-    margin-top: 72px;
+    padding-top: 72px;
     margin-left: calc(30px / 2);
     margin-right: calc(30px / 2);
     margin-bottom: 30px;
@@ -36297,7 +36306,7 @@ body {
 
 @media (max-width:991.98px) {
     .body-wrapper {
-        margin-top: 80px
+        padding-top: 100px
     }
 
     .body-wrapper .container-fluid,
@@ -36358,7 +36367,7 @@ html[data-boxed-layout=boxed] .container-md,
 html[data-boxed-layout=boxed] .container-sm,
 html[data-boxed-layout=boxed] .container-xl,
 html[data-boxed-layout=boxed] .container-xxl {
-    max-width: 1200px;
+    max-width: 1800px;
     margin: 0 auto
 }
 
@@ -37012,7 +37021,7 @@ html[data-layout=horizontal] .notification {
 }
 
 html[data-layout=horizontal] .body-wrapper {
-    margin-top: 145px;
+    padding-top: 145px;
     min-height: auto
 }
 
@@ -37055,7 +37064,7 @@ html[data-layout=horizontal] .body-wrapper>.container-xxl {
     html[data-layout=horizontal] .navbar,
     html[data-layout=horizontal] .scroll-sidebar {
         position: relative;
-        max-width: 1200px;
+        max-width: 1800px;
         margin: 0 auto
     }
 
@@ -37241,7 +37250,7 @@ html[data-layout=horizontal] .body-wrapper>.container-xxl {
 
 @media (max-width:1299.98px) {
     html[data-layout=horizontal] .body-wrapper {
-        margin-top: 80px
+        padding-top: 80px
     }
 
     html[data-layout=horizontal].show-sidebar .left-sidebar {
@@ -37541,6 +37550,7 @@ html[data-layout=horizontal] .body-wrapper>.container-xxl {
 
 .btn.bg-danger-subtle:hover {
     background-color: var(--bs-danger) !important;
+    border-color: var(--bs-danger) !important;
     color: var(--bs-white) !important
 }
 
@@ -46982,7 +46992,7 @@ body pre[class*=language-] {
 }
 
 .bg-primary-gt {
-    background: linear-gradient(261.23deg, var(--green-color) .42%, #5a52ff 100%);
+    background: linear-gradient(261.23deg, var(--green-color) .42%, #283b08 100%);
     position: relative
 }
 
@@ -47654,8 +47664,7 @@ h6 {
     position: absolute;
     bottom: -4%;
     right: 1%;
-    height: 450px;
-    width: 450px;
+    width: 250px;
     display: block;
     background: 0 0;
     z-index: 1;
@@ -47712,3 +47721,15 @@ h6 {
 .brown-background{
     background-color:var(--brown-color)!important;
 }
+
+.our-avatars > img{
+    transition: border .1s;
+    border-radius: 4rem;
+    padding: .1rem!important;
+    margin: .1rem;
+}
+
+.signup.our-avatars > img{
+    border-radius: 1rem;
+}
+

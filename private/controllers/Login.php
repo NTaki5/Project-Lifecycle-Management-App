@@ -8,8 +8,8 @@ class Login extends Controller{
         $errors = array();
         if(count($_POST)){
             $user = new User();
-            if($row = $user->where('email', $_POST['email'])){
-
+            if($row = count($user->where('email', $_POST['email'])) ? $user->where('email', $_POST['email']) : $user->where('username', $_POST['email'])){
+                // print_r($row); die();
                 $row = $row[0];
                 if(password_verify($_POST["password"],$row->password)){
                     Auth::authenticate($row);

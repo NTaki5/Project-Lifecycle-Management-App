@@ -13,7 +13,7 @@
   <!-- Core Css -->
   <link rel="stylesheet" href="assets/css/styles.css" />
 
-  <title>PLM Bootstrap Admin</title>
+  <title>Project Lifecycle Managemenet</title>
 </head>
 
 <body>
@@ -54,34 +54,38 @@
                   <span class="border-top w-100 position-absolute top-50 start-50 translate-middle"></span>
                 </div> -->
                 <form method="POST" class="needs-validation" enctype="multipart/form-data">
-                  <div class="mb-3">
-                    <label for="companyName" class="form-label">Company Name</label>
-                    <input type="text" value="<?= get_var("companyName") ?>" name="companyName" class="form-control" id="companyName">
-                    <div class="invalid-feedback">
-                      <?php echo isset($errors["companyName"]) ? $errors["companyName"] : "" ?>
+
+                  <?php if (!isset($_GET['token'])) : ?>
+                    <div class="mb-3">
+                      <label for="companyName" class="form-label">Company Name</label>
+                      <input type="text" value="<?= get_var("companyName") ?>" name="companyName" class="form-control" id="companyName">
+                      <div class="invalid-feedback">
+                        <?php echo isset($errors["companyName"]) ? $errors["companyName"] : "" ?>
+                      </div>
                     </div>
-                  </div>
-                  <div class="mb-3">
-                    <label for="companyCUI" class="form-label">Unique identification code (CUI/CIF)</label>
-                    <input type="text" value="<?= get_var("companyCUI") ?>" name="companyCUI" class="form-control" id="companyCUI">
-                    <div class="invalid-feedback">
-                      <?php echo isset($errors["companyCUI"]) ? $errors["companyCUI"] : "" ?>
+                    <div class="mb-3">
+                      <label for="companyCUI" class="form-label">Unique identification code (CUI/CIF)</label>
+                      <input type="text" value="<?= get_var("companyCUI") ?>" name="companyCUI" class="form-control" id="companyCUI">
+                      <div class="invalid-feedback">
+                        <?php echo isset($errors["companyCUI"]) ? $errors["companyCUI"] : "" ?>
+                      </div>
                     </div>
-                  </div>
-                  <div class="mb-3">
-                    <label for="companyAddress" class="form-label">Company Address</label>
-                    <input type="text" value="<?= get_var("companyAddress") ?>" name="companyAddress" class="form-control" id="companyAddress">
-                    <div class="invalid-feedback">
-                      <?php echo isset($errors["companyAddress"]) ? $errors["companyAddress"] : "" ?>
+                    <div class="mb-3">
+                      <label for="companyAddress" class="form-label">Company Address</label>
+                      <input type="text" value="<?= get_var("companyAddress") ?>" name="companyAddress" class="form-control" id="companyAddress">
+                      <div class="invalid-feedback">
+                        <?php echo isset($errors["companyAddress"]) ? $errors["companyAddress"] : "" ?>
+                      </div>
                     </div>
-                  </div>
-                  <div class="mb-3">
-                    <label for="companyType" class="form-label">Type of legal entity (SRL, PFA, etc.)</label>
-                    <input type="text" value="<?= get_var("companyType") ?>" name="companyType" class="form-control" id="companyType">
-                    <div class="invalid-feedback">
-                      <?php echo isset($errors["companyType"]) ? $errors["companyType"] : "" ?>
+                    <div class="mb-3">
+                      <label for="companyType" class="form-label">Type of legal entity (SRL, PFA, etc.)</label>
+                      <input type="text" value="<?= get_var("companyType") ?>" name="companyType" class="form-control" id="companyType">
+                      <div class="invalid-feedback">
+                        <?php echo isset($errors["companyType"]) ? $errors["companyType"] : "" ?>
+                      </div>
                     </div>
-                  </div>
+                  <?php endif; ?>
+
                   <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
                     <input type="text" value="<?= get_var("username") ?>" name="username" class="form-control" id="username">
@@ -89,25 +93,28 @@
                       <?php echo isset($errors["username"]) ? $errors["username"] : "" ?>
                     </div>
                   </div>
+
+                  <?php if (isset($_GET['token'])): ?>
+                    <div class="mb-3">
+                      <label for="occupation" class="form-label">Occupation</label>
+                      <input type="text" value="<?= get_var("occupation") ?>" name="occupation" class="form-control" id="occupation">
+                      <div class="invalid-feedback">
+                        <?php echo isset($errors["occupation"]) ? $errors["occupation"] : "" ?>
+                      </div>
+                    </div>
+                  <?php endif; ?>
                   <div class="mb-3">
-                    <label for="firstname" class="form-label">First Name</label>
-                    <input type="text" value="<?= get_var("firstname") ?>" name="firstname" class="form-control" id="firstname">
+                    <label for="name" class="form-label">Last Name</label>
+                    <input type="text" value="<?= get_var("name") ?>" name="name" class="form-control" id="name">
                     <div class="invalid-feedback">
-                      <?php echo isset($errors["firstname"]) ? $errors["firstname"] : "" ?>
+                      <?php echo isset($errors["name"]) ? $errors["name"] : "" ?>
                     </div>
                   </div>
                   <div class="mb-3">
-                    <label for="lastname" class="form-label">Last Name</label>
-                    <input type="text" value="<?= get_var("lastname") ?>" name="lastname" class="form-control" id="lastname">
+                    <label for="birthday" class="form-label">Day of birth</label>
+                    <input type="date" value="<?= get_var("birthday") ?>" name="birthday" class="form-control" id="birthday">
                     <div class="invalid-feedback">
-                      <?php echo isset($errors["lastname"]) ? $errors["lastname"] : "" ?>
-                    </div>
-                  </div>
-                  <div class="mb-3">
-                    <label for="Birthday" class="form-label">Day of birth</label>
-                    <input type="date" value="<?= get_var("Birthday") ?>" name="Birthday" class="form-control" id="Birthday">
-                    <div class="invalid-feedback">
-                      <?php echo isset($errors["Birthday"]) ? $errors["Birthday"] : "" ?>
+                      <?php echo isset($errors["birthday"]) ? $errors["birthday"] : "" ?>
                     </div>
                   </div>
                   <div class="mb-3">
@@ -115,6 +122,34 @@
                     <input type="text" value="<?= get_var("email") ?>" name="email" class="form-control" id="email">
                     <div class="invalid-feedback">
                       <?php echo isset($errors["email"]) ? $errors["email"] : "" ?>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="phone" class="form-label">Phone</label>
+                    <input type="text" value="<?= get_var("phone") ?>" name="phone" class="form-control" id="phone">
+                    <div class="invalid-feedback">
+                      <?php echo isset($errors["phone"]) ? $errors["phone"] : "" ?>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="facebook" class="form-label">Facebook</label>
+                    <input type="text" value="<?= get_var("facebook") ?>" name="facebook" class="form-control" id="facebook">
+                    <div class="invalid-feedback">
+                      <?php echo isset($errors["facebook"]) ? $errors["facebook"] : "" ?>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="instagram" class="form-label">Instagram</label>
+                    <input type="text" value="<?= get_var("instagram") ?>" name="instagram" class="form-control" id="instagram">
+                    <div class="invalid-feedback">
+                      <?php echo isset($errors["instagram"]) ? $errors["instagram"] : "" ?>
+                    </div>
+                  </div>
+                  <div class="mb-3">
+                    <label for="youtube" class="form-label">YouTube</label>
+                    <input type="text" value="<?= get_var("youtube") ?>" name="youtube" class="form-control" id="youtube">
+                    <div class="invalid-feedback">
+                      <?php echo isset($errors["youtube"]) ? $errors["youtube"] : "" ?>
                     </div>
                   </div>
                   <div class="mb-4 position-relative">
@@ -135,7 +170,7 @@
                     <label for="image" class="form-label">Profile image
                       <span>(Upload your photo, or choose an avatar)</span>
                     </label>
-                    <div class="row">
+                    <div class="row signup our-avatars w-100 m-auto mb-4 justify-content-center">
                       <input type="file" name="image" class="form-control col-12 mb-3" accept="images/*">
 
                       <?php $avatarsArr = get_avatars();
@@ -187,40 +222,32 @@
   <div class="dark-transparent sidebartoggler"></div>
   <!-- Import Js Files -->
   <script src=" <?= ROOT ?>/assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src=" <?= ROOT ?>/assets/js/theme/theme.js"></script>
+  <script src=" <?= ROOT ?>/assets/js/app/theme.js"></script>
   <script src=" <?= ROOT ?>/assets/js/custom/bootstrapValidate.js"></script>
 
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
-  <script src="<?= ROOT ?>/assets/libs/dropzone/dist/min/dropzone.min.js" />
-  </script>
-  <script>
+  <script src="<?= ROOT ?>/assets/libs/dropzone/dist/min/dropzone.min.js"></script>
+  <!-- show and hide the password -->
+  <script defer>
     const togglePassword = document
       .querySelector('#togglePassword');
     const togglePassword2 = document
       .querySelector('.pass2#togglePassword');
 
-    togglePassword.addEventListener('click', () => {
-      // Toggle the type attribute using
-      // getAttribure() method
-      const type = togglePassword.previousElementSibling
-        .getAttribute('type') === 'password' ?
-        'text' : 'password';
-      togglePassword.previousElementSibling.setAttribute('type', type);
-      // Toggle the eye and bi-eye icon
-      togglePassword.classList.toggle('bi-eye');
-    });
+    const passArray = [togglePassword, togglePassword2];
 
-
-    togglePassword2.addEventListener('click', () => {
-      // Toggle the type attribute using
-      // getAttribure() method
-      const type = togglePassword2.previousElementSibling
-        .getAttribute('type') === 'password' ?
-        'text' : 'password';
-      togglePassword2.previousElementSibling.setAttribute('type', type);
-      // Toggle the eye and bi-eye icon
-      togglePassword2.classList.toggle('bi-eye');
+    passArray.forEach(element => {
+      element.addEventListener('click', () => {
+        // Toggle the type attribute using
+        // getAttribure() method
+        const type = element.previousElementSibling
+          .getAttribute('type') === 'password' ?
+          'text' : 'password';
+        element.previousElementSibling.setAttribute('type', type);
+        // Toggle the eye and bi-eye icon
+        element.classList.toggle('bi-eye');
+      });
     });
   </script>
 

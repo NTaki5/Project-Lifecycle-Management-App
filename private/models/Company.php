@@ -6,10 +6,9 @@ class Company extends Model{
 
 
         public function validate($data){
-
             $this->errors = array();
             $return = true;
-            if(empty($data["companyName"]) || !preg_match("/^[a-z A-Z]+$/",$data["companyName"])){
+            if(empty($data["companyName"]) || !preg_match("/^[a-z. A-Z]+$/",$data["companyName"])){
                 $this->errors["companyName"] = "Only letters allowed in company name";
                 $return = false;
             }

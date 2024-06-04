@@ -1,5 +1,5 @@
 <?php
-    $this->view("/includes/header");
+$this->view("/includes/header");
 ?>
 <div class="container-fluid">
     <div class="card card-body py-3">
@@ -10,7 +10,7 @@
                     <nav aria-label="breadcrumb" class="ms-auto">
                         <ol class="breadcrumb">
                             <li class="breadcrumb-item d-flex align-items-center">
-                                <a class="text-muted text-decoration-none d-flex" href="../main/index.html">
+                                <a class="text-muted text-decoration-none d-flex" href="home">
                                     <iconify-icon icon="solar:home-2-line-duotone" class="fs-6"></iconify-icon>
                                 </a>
                             </li>
@@ -34,24 +34,6 @@
                     <span class="d-none d-md-block">Account</span>
                 </button>
             </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-notifications-tab" data-bs-toggle="pill" data-bs-target="#pills-notifications" type="button" role="tab" aria-controls="pills-notifications" aria-selected="false">
-                    <i class="ti ti-bell me-2 fs-6"></i>
-                    <span class="d-none d-md-block">Notifications</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-bills-tab" data-bs-toggle="pill" data-bs-target="#pills-bills" type="button" role="tab" aria-controls="pills-bills" aria-selected="false">
-                    <i class="ti ti-article me-2 fs-6"></i>
-                    <span class="d-none d-md-block">Bills</span>
-                </button>
-            </li>
-            <li class="nav-item" role="presentation">
-                <button class="nav-link position-relative rounded-0 d-flex align-items-center justify-content-center bg-transparent fs-3 py-3" id="pills-security-tab" data-bs-toggle="pill" data-bs-target="#pills-security" type="button" role="tab" aria-controls="pills-security" aria-selected="false">
-                    <i class="ti ti-lock me-2 fs-6"></i>
-                    <span class="d-none d-md-block">Security</span>
-                </button>
-            </li>
         </ul>
         <div class="card-body">
             <div class="tab-content" id="pills-tabContent">
@@ -62,14 +44,38 @@
                                 <div class="card-body p-4">
                                     <h4 class="card-title">Change Profile</h4>
                                     <p class="card-subtitle mb-4">Change your profile picture from here</p>
-                                    <div class="text-center">
-                                        <img src="../assets/images/profile/user-1.jpg" alt="matdash-img" class="img-fluid rounded-circle" width="120" height="120">
-                                        <div class="d-flex align-items-center justify-content-center my-4 gap-6">
-                                            <button class="btn btn-primary">Upload</button>
-                                            <button class="btn bg-danger-subtle text-danger">Reset</button>
+                                    <form id="profile-image-form" method="POST" enctype="multipart/form-data">
+                                        <div class="text-center">
+                                            <img src="<?= strlen(Auth::getImage()) ? 'uploads/users/' . Auth::getImage() : 'assets/images/profile/' . Auth::getAvatar() ?>" alt="matdash-img" class="object-fit-cover rounded-circle" width="120" height="120">
+                                            <div class="d-flex align-items-center justify-content-center my-4 gap-6">
+                                                <a id="upload-button" class="btn btn-primary">Upload</a>
+                                                <input type="file" id="file-input" name="image" class="d-none" accept="images/*">
+                                                <button type="submit" name="delete-image" class="btn bg-danger-subtle text-danger">Reset</b>
+                                            </div>
+                                            <h6 class="mb-0">OR choose from our avatars</h6>
                                         </div>
-                                        <p class="mb-0">Allowed JPG, GIF or PNG. Max size of 800K</p>
-                                    </div>
+
+                                        <div class="row our-avatars w-100 m-auto mb-4 justify-content-center">
+
+                                            <?php $avatarsArr = get_avatars();
+
+                                            if (!count($avatarsArr)) echo '<h6>No avatars at the moment</h6>';
+                                            else {
+                                                $userAvatar = Auth::getAvatar();
+                                                foreach ($avatarsArr['paths'] as $key => $value) {
+                                                    $border = strpos($value, $userAvatar) ? (" border-dark border-4") : "";
+                                                    echo '<img class="avatar p-0 col-3 col-sm-2 col-md-2 object-fit-cover border' . $border . '" src="' . $value . '" alt="Avatar 1" data-avatar="' . $avatarsArr['names'][$key] . '">';
+                                                }
+                                            }
+
+                                            ?>
+                                            <input type="text" name="avatar" id="selectedAvatar" value="<?= $userAvatar ?>" hidden>
+                                        </div>
+                                        <div class="text-center">
+                                            <button type="submit" name="update-profile-image" class="btn btn-primary w-100">Save</button>
+
+                                        </div>
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -77,414 +83,159 @@
                             <div class="card w-100 border position-relative overflow-hidden">
                                 <div class="card-body p-4">
                                     <h4 class="card-title">Change Password</h4>
-                                    <p class="card-subtitle mb-4">To change your password please confirm here</p>
-                                    <form>
-                                        <div class="mb-3">
-                                            <label for="exampleInputPassword1" class="form-label">Current Password</label>
-                                            <input type="password" class="form-control" id="exampleInputPassword1" value="12345678910">
+
+                                    <div class="valid-feedback mb-4">
+                                        <?php echo isset($successes["resetPassword"]) ? $successes["resetPassword"] : "" ?>
+                                    </div>
+
+                                    <form method="POST">
+
+                                        <div class="mb-4 position-relative">
+                                            <label for="old_password" class="form-label">Current Password</label>
+                                            <input type="password" value="<?= get_var("old_password") ?>" name="old_password" class="form-control" id="old_password">
+                                            <i class="bi bi-eye-slash" id="togglePassword"></i>
+                                            <div class="invalid-feedback">
+                                                <?php echo isset($errors["old_password"]) ? $errors["old_password"] : "" ?>
+                                            </div>
                                         </div>
-                                        <div class="mb-3">
-                                            <label for="exampleInputPassword2" class="form-label">New Password</label>
-                                            <input type="password" class="form-control" id="exampleInputPassword2" value="12345678910">
+                                        <div class="mb-4 position-relative">
+                                            <label for="new_password" class="form-label">New password</label>
+                                            <input type="password" value="<?= get_var("password") ?>" name="password" class="form-control" id="password">
+                                            <i class="bi bi-eye-slash pass2" id="togglePassword"></i>
+
                                         </div>
-                                        <div>
-                                            <label for="exampleInputPassword3" class="form-label">Confirm Password</label>
-                                            <input type="password" class="form-control" id="exampleInputPassword3" value="12345678910">
+                                        <div class="mb-4 position-relative">
+                                            <label for="password_confirm" class="form-label">Confirm password</label>
+                                            <input type="password" value="<?= get_var("password_confirm") ?>" name="password_confirm" class="form-control" id="new_password_confirm">
+                                            <i class="bi bi-eye-slash pass2-confirm" id="togglePassword"></i>
+                                            <div class="invalid-feedback">
+                                                <?php echo isset($errors["password"]) ? $errors["password"] : "" ?>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center justify-content-end gap-6">
+                                                <button type="submit" name="resetPassword" class="btn btn-primary">Save</button>
+                                                <a href="<?= $_SERVER['REQUEST_URI']; ?>" class="btn bg-danger-subtle text-danger">Cancel</a>
+                                            </div>
                                         </div>
                                     </form>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-12">
+                        <div class="col-12" id="account-details">
                             <div class="card w-100 border position-relative overflow-hidden mb-0">
                                 <div class="card-body p-4">
                                     <h4 class="card-title">Personal Details</h4>
                                     <p class="card-subtitle mb-4">To change your personal detail , edit and save from here</p>
-                                    <form>
+                                    <span class="valid-feedback"><?= isset($successes['accountUpdated']) ? $successes['accountUpdated'] : ""; ?></span>
+                                    <form method="POST" class="needs-validation" enctype="multipart/form-data">
                                         <div class="row">
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext" class="form-label">Your Name</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext" placeholder="Mathew Anderson">
+                                            <?php if (Auth::getRole() === 'admin') : ?>
+                                                <div class="mb-3 col-lg-4 col-md-6">
+                                                    <label for="companyName" class="form-label">Company Name</label>
+                                                    <input type="text" value="<?= strlen(get_var("companyName")) ? get_var("companyName") : Auth::getCompanyName(); ?>" name="companyName" class="form-control" id="companyName">
+                                                    <div class="invalid-feedback">
+                                                        <?php echo isset($errors["companyName"]) ? $errors["companyName"] : "" ?>
+                                                    </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Location</label>
-                                                    <select class="form-select" aria-label="Default select example">
-                                                        <option selected>United Kingdom</option>
-                                                        <option value="1">United States</option>
-                                                        <option value="2">United Kingdom</option>
-                                                        <option value="3">India</option>
-                                                        <option value="3">Russia</option>
-                                                    </select>
+                                                <div class="mb-3 col-lg-4 col-md-6">
+                                                    <label for="companyCUI" class="form-label">Unique identification code (CUI/CIF)</label>
+                                                    <input type="text" value="<?= strlen(get_var("companyCUI")) ? get_var("companyCUI") : Auth::getCompanyCUI(); ?>" name="companyCUI" class="form-control" id="companyCUI">
+                                                    <div class="invalid-feedback">
+                                                        <?php echo isset($errors["companyCUI"]) ? $errors["companyCUI"] : "" ?>
+                                                    </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext1" class="form-label">Email</label>
-                                                    <input type="email" class="form-control" id="exampleInputtext1" placeholder="info@modernize.com">
+                                                <div class="mb-3 col-lg-4 col-md-6">
+                                                    <label for="companyAddress" class="form-label">Company Address</label>
+                                                    <input type="text" value="<?= strlen(get_var("companyAddress")) ? get_var("companyAddress") : Auth::getCompanyAddress(); ?>" name="companyAddress" class="form-control" id="companyAddress">
+                                                    <div class="invalid-feedback">
+                                                        <?php echo isset($errors["companyAddress"]) ? $errors["companyAddress"] : "" ?>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext2" class="form-label">Store Name</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext2" placeholder="Maxima Studio">
+                                                <div class="mb-3 col-lg-12 col-md-6">
+                                                    <label for="companyType" class="form-label">Type of legal entity (SRL, PFA, etc.)</label>
+                                                    <input type="text" value="<?= strlen(get_var("companyType")) ? get_var("companyType") : Auth::getCompanyType(); ?>" name="companyType" class="form-control" id="companyType">
+                                                    <div class="invalid-feedback">
+                                                        <?php echo isset($errors["companyType"]) ? $errors["companyType"] : "" ?>
+                                                    </div>
                                                 </div>
-                                                <div class="mb-3">
-                                                    <label class="form-label">Currency</label>
-                                                    <select class="form-select" aria-label="Default select example">
-                                                        <option selected>India (INR)</option>
-                                                        <option value="1">US Dollar ($)</option>
-                                                        <option value="2">United Kingdom (Pound)</option>
-                                                        <option value="3">India (INR)</option>
-                                                        <option value="3">Russia (Ruble)</option>
-                                                    </select>
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext3" class="form-label">Phone</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext3" placeholder="+91 12345 65478">
+                                            <?php endif; ?>
+                                            <div class="mb-3 col-lg-4 col-md-6">
+                                                <label for="username" class="form-label">Username</label>
+                                                <input type="text" value="<?= strlen(get_var("username")) ? get_var("username") : Auth::getUsername(); ?>" name="username" class="form-control" id="username">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["username"]) ? $errors["username"] : "" ?>
                                                 </div>
                                             </div>
-                                            <div class="col-12">
-                                                <div>
-                                                    <label for="exampleInputtext4" class="form-label">Address</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext4" placeholder="814 Howard Street, 120065, India">
+                                            <div class="mb-3 col-lg-4 col-md-6">
+                                                <label for="firstname" class="form-label">First Name</label>
+                                                <input type="text" value="<?= strlen(get_var("firstname")) ? get_var("firstname") : Auth::getFirstname(); ?>" name="firstname" class="form-control" id="firstname">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["firstname"]) ? $errors["firstname"] : "" ?>
                                                 </div>
                                             </div>
-                                            <div class="col-12">
-                                                <div class="d-flex align-items-center justify-content-end mt-4 gap-6">
-                                                    <button class="btn btn-primary">Save</button>
-                                                    <button class="btn bg-danger-subtle text-danger">Cancel</button>
+                                            <div class="mb-3 col-lg-4 col-md-6">
+                                                <label for="lastname" class="form-label">Last Name</label>
+                                                <input type="text" value="<?= strlen(get_var("lastname")) ? get_var("lastname") : Auth::getLastname(); ?>" name="lastname" class="form-control" id="lastname">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["lastname"]) ? $errors["lastname"] : "" ?>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 col-lg-4 col-md-6">
+                                                <label for="birthday" class="form-label">Day of birth</label>
+                                                <input type="date" value="<?= strlen(get_var("birthday")) ? get_var("birthday") : Auth::getBirthday(); ?>" name="birthday" class="form-control" id="birthday">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["birthday"]) ? $errors["birthday"] : "" ?>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 col-lg-4 col-md-6">
+                                                <label for="email" class="form-label">Email address</label>
+                                                <input type="text" value="<?= strlen(get_var("email")) ? get_var("email") : Auth::getEmail(); ?>" name="email" class="form-control" id="email">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["email"]) ? $errors["email"] : "" ?>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3 col-lg-4 col-md-6">
+                                                <label for="phone" class="form-label">Phone</label>
+                                                <input type="text" value="<?= get_var("phone") ?>" name="phone" class="form-control" id="phone">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["phone"]) ? $errors["phone"] : "" ?>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="facebook" class="form-label">Facebook</label>
+                                                <input type="text" value="<?= get_var("facebook") ?>" name="facebook" class="form-control" id="facebook">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["facebook"]) ? $errors["facebook"] : "" ?>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="instagram" class="form-label">Instagram</label>
+                                                <input type="text" value="<?= get_var("instagram") ?>" name="instagram" class="form-control" id="instagram">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["instagram"]) ? $errors["instagram"] : "" ?>
+                                                </div>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="youtube" class="form-label">YouTube</label>
+                                                <input type="text" value="<?= get_var("youtube") ?>" name="youtube" class="form-control" id="youtube">
+                                                <div class="invalid-feedback">
+                                                    <?php echo isset($errors["youtube"]) ? $errors["youtube"] : "" ?>
                                                 </div>
                                             </div>
                                         </div>
+
+                                        <div class="col-12">
+                                            <div class="d-flex align-items-center justify-content-end gap-6">
+                                                <button type="submit" name="edit-account-details" class="btn btn-primary">Save</button>
+                                                <a href="<?= $_SERVER['REQUEST_URI']; ?>" class="btn bg-danger-subtle text-danger">Cancel</a>
+                                            </div>
+                                        </div>
+
                                     </form>
                                 </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="pills-notifications" role="tabpanel" aria-labelledby="pills-notifications-tab" tabindex="0">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-9">
-                            <div class="card border shadow-none">
-                                <div class="card-body p-4">
-                                    <h4 class="card-title">Notification Preferences</h4>
-                                    <p class="card-subtitle mb-4">
-                                        Select the notificaitons ou would like to receive via email. Please note that you cannot opt
-                                        out of receving service
-                                        messages, such as payment, security or legal notifications.
-                                    </p>
-                                    <form class="mb-7">
-                                        <label for="exampleInputtext5" class="form-label">Email Address*</label>
-                                        <input type="text" class="form-control" id="exampleInputtext5" placeholder="" required>
-                                        <p class="mb-0">Required for notificaitons.</p>
-                                    </form>
-                                    <div>
-                                        <div class="d-flex align-items-center justify-content-between mb-4">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                    <i class="ti ti-article text-dark d-block fs-7" width="22" height="22"></i>
-                                                </div>
-                                                <div>
-                                                    <h5 class="fs-4 fw-semibold">Our newsletter</h5>
-                                                    <p class="mb-0">We'll always let you know about important changes</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-check form-switch mb-0">
-                                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-4">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                    <i class="ti ti-checkbox text-dark d-block fs-7" width="22" height="22"></i>
-                                                </div>
-                                                <div>
-                                                    <h5 class="fs-4 fw-semibold">Order Confirmation</h5>
-                                                    <p class="mb-0">You will be notified when customer order any product</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-check form-switch mb-0">
-                                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked1" checked>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-4">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                    <i class="ti ti-clock-hour-4 text-dark d-block fs-7" width="22" height="22"></i>
-                                                </div>
-                                                <div>
-                                                    <h5 class="fs-4 fw-semibold">Order Status Changed</h5>
-                                                    <p class="mb-0">You will be notified when customer make changes to the order</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-check form-switch mb-0">
-                                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked2" checked>
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between mb-4">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                    <i class="ti ti-truck-delivery text-dark d-block fs-7" width="22" height="22"></i>
-                                                </div>
-                                                <div>
-                                                    <h5 class="fs-4 fw-semibold">Order Delivered</h5>
-                                                    <p class="mb-0">You will be notified once the order is delivered</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-check form-switch mb-0">
-                                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked3">
-                                            </div>
-                                        </div>
-                                        <div class="d-flex align-items-center justify-content-between">
-                                            <div class="d-flex align-items-center gap-3">
-                                                <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                    <i class="ti ti-mail text-dark d-block fs-7" width="22" height="22"></i>
-                                                </div>
-                                                <div>
-                                                    <h5 class="fs-4 fw-semibold">Email Notification</h5>
-                                                    <p class="mb-0">Turn on email notificaiton to get updates through email</p>
-                                                </div>
-                                            </div>
-                                            <div class="form-check form-switch mb-0">
-                                                <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked4" checked>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-9">
-                            <div class="card border shadow-none">
-                                <div class="card-body p-4">
-                                    <h4 class="card-title">Date & Time</h4>
-                                    <p class="card-subtitle">Time zones and calendar display settings.</p>
-                                    <div class="d-flex align-items-center justify-content-between mt-7">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-clock-hour-4 text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <p class="mb-0">Time zone</p>
-                                                <h5 class="fs-4 fw-semibold">(UTC + 02:00) Athens, Bucharet</h5>
-                                            </div>
-                                        </div>
-                                        <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Download">
-                                            <i class="ti ti-download"></i>
-                                        </a>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-9">
-                            <div class="card border shadow-none">
-                                <div class="card-body p-4">
-                                    <h4 class="card-title">Ignore Tracking</h4>
-                                    <div class="d-flex align-items-center justify-content-between mt-7">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-player-pause text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold">Ignore Browser Tracking</h5>
-                                                <p class="mb-0">Browser Cookie</p>
-                                            </div>
-                                        </div>
-                                        <div class="form-check form-switch mb-0">
-                                            <input class="form-check-input" type="checkbox" role="switch" id="flexSwitchCheckChecked5">
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="d-flex align-items-center justify-content-end gap-6">
-                                <button class="btn btn-primary">Save</button>
-                                <button class="btn bg-danger-subtle text-danger">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="pills-bills" role="tabpanel" aria-labelledby="pills-bills-tab" tabindex="0">
-                    <div class="row justify-content-center">
-                        <div class="col-lg-9">
-                            <div class="card border shadow-none">
-                                <div class="card-body p-4">
-                                    <h4 class="card-title mb-3">Billing Information</h4>
-                                    <form>
-                                        <div class="row">
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext6" class="form-label">Business
-                                                        Name*</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext6" placeholder="Visitor Analytics">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext7" class="form-label">Business
-                                                        Address*</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext7" placeholder="">
-                                                </div>
-                                                <div>
-                                                    <label for="exampleInputtext8" class="form-label">First Name*</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext8" placeholder="">
-                                                </div>
-                                            </div>
-                                            <div class="col-lg-6">
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext9" class="form-label">Business
-                                                        Sector*</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext9" placeholder="Arts, Media & Entertainment">
-                                                </div>
-                                                <div class="mb-3">
-                                                    <label for="exampleInputtext10" class="form-label">Country*</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext10" placeholder="Romania">
-                                                </div>
-                                                <div>
-                                                    <label for="exampleInputtext11" class="form-label">Last Name*</label>
-                                                    <input type="text" class="form-control" id="exampleInputtext11" placeholder="">
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </form>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-9">
-                            <div class="card border shadow-none">
-                                <div class="card-body p-4">
-                                    <h4 class="card-title">Current Plan : <span class="text-success">Executive</span>
-                                    </h4>
-                                    <p class="card-subtitle">Thanks for being a premium member and supporting our development.</p>
-                                    <div class="d-flex align-items-center justify-content-between mt-7 mb-3">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-package text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <p class="mb-0">Current Plan</p>
-                                                <h5 class="fs-4 fw-semibold">750.000 Monthly Visits</h5>
-                                            </div>
-                                        </div>
-                                        <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Add">
-                                            <i class="ti ti-circle-plus"></i>
-                                        </a>
-                                    </div>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <button class="btn btn-primary">Change Plan</button>
-                                        <button class="btn bg-danger-subtle text-danger">Reset Plan</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-9">
-                            <div class="card border shadow-none">
-                                <div class="card-body p-4">
-                                    <h4 class="card-title">Payment Method</h4>
-                                    <p class="card-subtitle">On 26 December, 2023</p>
-                                    <div class="d-flex align-items-center justify-content-between mt-7">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <div class="text-bg-light rounded-1 p-6 d-flex align-items-center justify-content-center">
-                                                <i class="ti ti-credit-card text-dark d-block fs-7" width="22" height="22"></i>
-                                            </div>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold">Visa</h5>
-                                                <p class="mb-0 text-dark">*****2102</p>
-                                            </div>
-                                        </div>
-                                        <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Edit">
-                                            <i class="ti ti-pencil-minus"></i>
-                                        </a>
-                                    </div>
-                                    <p class="my-2">If you updated your payment method, it will only be dislpayed here after your
-                                        next billing cycle.</p>
-                                    <div class="d-flex align-items-center gap-3">
-                                        <button class="btn bg-danger-subtle text-danger">Cancel Subscription</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="d-flex align-items-center justify-content-end gap-6">
-                                <button class="btn btn-primary">Save</button>
-                                <button class="btn bg-danger-subtle text-danger">Cancel</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="tab-pane fade" id="pills-security" role="tabpanel" aria-labelledby="pills-security-tab" tabindex="0">
-                    <div class="row">
-                        <div class="col-lg-8">
-                            <div class="card border shadow-none">
-                                <div class="card-body p-4">
-                                    <h4 class="card-title mb-3">Two-factor Authentication</h4>
-                                    <div class="d-flex align-items-center justify-content-between pb-7">
-                                        <p class="card-subtitle mb-0">Lorem ipsum, dolor sit amet consectetur adipisicing elit. Corporis sapiente
-                                            sunt earum officiis laboriosam ut.</p>
-                                        <button class="btn btn-primary">Enable</button>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between py-3 border-top">
-                                        <div>
-                                            <h5 class="fs-4 fw-semibold mb-0">Authentication App</h5>
-                                            <p class="mb-0">Google auth app</p>
-                                        </div>
-                                        <button class="btn bg-primary-subtle text-primary">Setup</button>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between py-3 border-top">
-                                        <div>
-                                            <h5 class="fs-4 fw-semibold mb-0">Another e-mail</h5>
-                                            <p class="mb-0">E-mail to send verification link</p>
-                                        </div>
-                                        <button class="btn bg-primary-subtle text-primary">Setup</button>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between py-3 border-top">
-                                        <div>
-                                            <h5 class="fs-4 fw-semibold mb-0">SMS Recovery</h5>
-                                            <p class="mb-0">Your phone number or something</p>
-                                        </div>
-                                        <button class="btn bg-primary-subtle text-primary">Setup</button>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-lg-4">
-                            <div class="card">
-                                <div class="card-body p-4">
-                                    <div class="text-bg-light rounded-1 p-6 d-inline-flex align-items-center justify-content-center mb-3">
-                                        <i class="ti ti-device-laptop text-primary d-block fs-7" width="22" height="22"></i>
-                                    </div>
-                                    <h4 class="card-title mb-0">Devices</h4>
-                                    <p class="mb-3">Lorem ipsum dolor sit amet consectetur adipisicing elit Rem.</p>
-                                    <button class="btn btn-primary mb-4">Sign out from all devices</button>
-                                    <div class="d-flex align-items-center justify-content-between py-3 border-bottom">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <i class="ti ti-device-mobile text-dark d-block fs-7" width="26" height="26"></i>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold mb-0">iPhone 14</h5>
-                                                <p class="mb-0">London UK, Oct 23 at 1:15 AM</p>
-                                            </div>
-                                        </div>
-                                        <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                    </div>
-                                    <div class="d-flex align-items-center justify-content-between py-3">
-                                        <div class="d-flex align-items-center gap-3">
-                                            <i class="ti ti-device-laptop text-dark d-block fs-7" width="26" height="26"></i>
-                                            <div>
-                                                <h5 class="fs-4 fw-semibold mb-0">Macbook Air</h5>
-                                                <p class="mb-0">Gujarat India, Oct 24 at 3:15 AM</p>
-                                            </div>
-                                        </div>
-                                        <a class="text-dark fs-6 d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)">
-                                            <i class="ti ti-dots-vertical"></i>
-                                        </a>
-                                    </div>
-                                    <button class="btn bg-primary-subtle text-primary w-100 py-1">Need Help ?</button>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col-12">
-                            <div class="d-flex align-items-center justify-content-end gap-6">
-                                <button class="btn btn-primary">Save</button>
-                                <button class="btn bg-danger-subtle text-danger">Cancel</button>
                             </div>
                         </div>
                     </div>
@@ -495,7 +246,60 @@
 </div>
 
 <?php
-echo '<pre>';
-print_r($data);
+// echo '<pre>';
+// print_r($data);
 $this->view("/includes/footer");
 ?>
+
+<!-- show and hide the password -->
+<script>
+    const togglePassword = document
+        .querySelector('#togglePassword');
+    const togglePassword2 = document
+        .querySelector('.pass2#togglePassword');
+    const togglePassword3 = document
+        .querySelector('.pass2-confirm#togglePassword');
+
+    const passArray = [togglePassword, togglePassword2, togglePassword3];
+
+    passArray.forEach(element => {
+        element.addEventListener('click', () => {
+            // Toggle the type attribute using
+            // getAttribure() method
+            const type = element.previousElementSibling
+                .getAttribute('type') === 'password' ?
+                'text' : 'password';
+            element.previousElementSibling.setAttribute('type', type);
+            // Toggle the eye and bi-eye icon
+            element.classList.toggle('bi-eye');
+        });
+    });
+
+    // Upload Button
+    // JavaScript to handle button click and trigger file input
+    document.getElementById('upload-button').addEventListener('click', function() {
+        document.getElementById('file-input').click();
+
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const avatarList = document.getElementsByClassName('avatar');
+
+        // Add click event listener to each avatar
+        //   avatarList.forEach(function(avatar) {
+
+        for (let avatar = 0; avatar < avatarList.length; avatar++) {
+            avatarList[avatar].addEventListener('click', function() {
+                // Remove border from all avatars
+                for (let avatar = 0; avatar < avatarList.length; avatar++) {
+                    avatarList[avatar].classList.remove("border-dark", "border-4");
+                };
+                this.classList.add("border-dark", "border-4");
+
+                // Set the selected avatar value to a hidden input field (optional)
+                document.getElementById('selectedAvatar').value = this.dataset.avatar;
+            });
+        };
+    });
+</script>

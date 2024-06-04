@@ -7,14 +7,11 @@ class Home extends Controller{
 
         // $user = $this->load_model("User");
         $user = new User(); //autoload in config.php
+        $data = isset($user->where('id',Auth::getId())[0]) ? $user->where('id',Auth::getId()) : $this->redirect("login");
 
-        $data = $user->where('id',Auth::getId());
+        $toast = new Toast(Auth::getUsername(), "How are you today?");
+        
+        $this->view("home", (array)$data[0]);
 
-        $this->view("home", $data);
-
-        //Don't show the welcome toast at each page refresh
-        if(!isset($_SESSION["notShowToast"])){
-            $_SESSION['notShowToast'] = true;
-        }
     }
 } 
