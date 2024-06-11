@@ -1,2 +1,2 @@
 <?php
-include "public";
+require_once "public/index.php";
