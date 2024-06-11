@@ -6,9 +6,16 @@ define('CONTROLLERS_PATH', '../private/controllers/');
 define('VIEWS_PATH', '../private/views/');
 define('MODELS_PATH', '../private/models/');
 
-define('DB_HOST', 'localhost');
-define('DB_USER', 'root');
-define('DB_PASS', '');
+// LOCALHOST
+// define('DB_HOST', 'localhost');
+// define('DB_USER', 'root');
+// define('DB_PASS', '');
+// define('DB_NAME', 'projectlifecyclemanagmentapp');
+
+// SERVER
+define('DB_HOST', 'projectlifecyclemanagmentapp-prolifemanagement.g.aivencloud.com');
+define('DB_USER', 'avnadmin');
+define('DB_PASS', 'AVNS_1cwcaFzsP7u87NMFIaY');
 define('DB_NAME', 'projectlifecyclemanagmentapp');
 
 define('SMTP_HOST', 'sandbox.smtp.mailtrap.io');
