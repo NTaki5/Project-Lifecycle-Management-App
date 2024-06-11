@@ -26,7 +26,9 @@ if(count($url)==4){
 }else if(count($url)==8){
     echo '<base href="../../../../../">';
 }
-
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
 require "../private/core/init.php";
 
 $app = new App();   
