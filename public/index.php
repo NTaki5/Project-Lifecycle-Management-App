@@ -1,16 +1,29 @@
 <?php
 session_start();
 
+// $url = explode ("/","$_SERVER[REQUEST_URI]");
+// if(count($url)==5){
+//     echo '<base href="../">';
+// }else if(count($url)==6){
+//     echo '<base href="../../">';
+// }else if(count($url)==7){
+//     echo '<base href="../../../">';
+// }else if(count($url)==8){
+//     echo '<base href="../../../../">';
+// }else if(count($url)==9){
+//     echo '<base href="../../../../../">';
+// }
+
 $url = explode ("/","$_SERVER[REQUEST_URI]");
-if(count($url)==5){
+if(count($url)==4){
     echo '<base href="../">';
-}else if(count($url)==6){
+}else if(count($url)==5){
     echo '<base href="../../">';
-}else if(count($url)==7){
+}else if(count($url)==6){
     echo '<base href="../../../">';
-}else if(count($url)==8){
+}else if(count($url)==7){
     echo '<base href="../../../../">';
-}else if(count($url)==9){
+}else if(count($url)==8){
     echo '<base href="../../../../../">';
 }
 
