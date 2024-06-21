@@ -164,3 +164,4 @@ $this->view("/includes/header");
 <?php
 $this->view("/includes/footer");
 ?>
+<script src="assets/js/apps/team.js"></script>

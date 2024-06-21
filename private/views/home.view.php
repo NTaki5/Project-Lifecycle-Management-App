@@ -44,7 +44,7 @@ $this->view("/includes/header");
                         <p class="card-subtitle mb-0">Last check on 25 february</p>
 
                         <div class="row mt-4">
-                            <div class="col-md-6">
+                            <div class="col-12">
                                 <div class="vstack gap-9 mt-2">
                                     <div class="hstack align-items-center gap-3">
                                         <div class="d-flex align-items-center justify-content-center round-48 rounded bg-primary-subtle flex-shrink-0">
@@ -78,7 +78,7 @@ $this->view("/includes/header");
                                     </div>
                                 </div>
                             </div>
-                            <div class="col-md-6">
+                            <!-- <div class="col-md-6">
                                 <div class="text-center">
                                     <div id="your-preformance"></div>
                                     <h2 class="fs-8">275</h2>
@@ -87,7 +87,7 @@ $this->view("/includes/header");
                                         startup.
                                     </p>
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
 
                     </div>
@@ -105,27 +105,8 @@ $this->view("/includes/header");
                 <!-- ----------------------------------------- -->
                 <div class="row">
                     <div class="col-lg-12">
-                        <div class="card">
-                            <div class="card-body">
-                                <div class="d-flex align-items-center gap-6 mb-4 pb-3">
-                                    <span class="round-48 d-flex align-items-center justify-content-center rounded bg-secondary-subtle">
-                                        <iconify-icon icon="solar:football-outline" class="fs-7 text-secondary"> </iconify-icon>
-                                    </span>
-                                    <h6 class="mb-0 fs-4">Company Employees</h6>
-                                </div>
-                                <div class="d-flex align-items-center justify-content-between mb-6">
-                                    <h6 class="mb-0 fw-medium">Active Users</h6>
-                                    <h6 class="mb-0 fw-medium">5/13</h6>
-                                </div>
-                                <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="5" aria-valuemin="0" aria-valuemax="13">
-                                    <div class="progress-bar bg-secondary" style="width: <?= (5 * 100) / 13 ?>%"></div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="col-lg-12">
 
-                        <div class="card mb-0">
+                        <div class="card">
                             <div class="card-body">
                                 <h5 class="card-title">Daily activities</h5>
                                 <ul class="timeline-widget mb-0 position-relative mb-n5" data-simplebar style="height: 425px;">
@@ -194,6 +175,25 @@ $this->view("/includes/header");
                             </div>
                         </div>
                     </div>
+                    <div class="col-lg-12">
+                        <div class="card mb-0">
+                            <div class="card-body">
+                                <div class="d-flex align-items-center gap-6 mb-4 pb-3">
+                                    <span class="round-48 d-flex align-items-center justify-content-center rounded bg-secondary-subtle">
+                                        <iconify-icon icon="solar:football-outline" class="fs-7 text-secondary"> </iconify-icon>
+                                    </span>
+                                    <h6 class="mb-0 fs-4">Company Employees</h6>
+                                </div>
+                                <div class="d-flex align-items-center justify-content-between mb-6">
+                                    <h6 class="mb-0 fw-medium">Active Users</h6>
+                                    <h6 class="mb-0 fw-medium">5/13</h6>
+                                </div>
+                                <div class="progress" role="progressbar" aria-label="Basic example" aria-valuenow="5" aria-valuemin="0" aria-valuemax="13">
+                                    <div class="progress-bar bg-secondary" style="width: <?= (5 * 100) / 13 ?>%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
             </div>
@@ -236,3 +236,5 @@ $this->view("/includes/header");
 // print_r($data);
 $this->view("/includes/footer");
 ?>
+
+<script src="assets/js/dashboards/my-dashboard.js" defer></script>

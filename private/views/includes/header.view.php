@@ -13,8 +13,25 @@
 
   <!-- Core Css -->
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css" />
-  <link rel="stylesheet" href= "<?=ROOT?>/assets/css/styles.css" />
-  <link rel="stylesheet" href="<?=ROOT?>/assets/libs/select2/dist/css/select2.min.css">
+  <link rel="stylesheet" href="<?= ROOT ?>/assets/css/styles.css" />
+  <link rel="stylesheet" href="<?= ROOT ?>/assets/libs/select2/dist/css/select2.min.css">
+
+  <?php
+  session_start();
+  $url = explode("/", "$_SERVER[REQUEST_URI]");
+  if (count($url) == 5) {
+    echo '<base href="../">';
+  } else if (count($url) == 6) {
+    echo '<base href="../../">';
+  } else if (count($url) == 7) {
+    echo '<base href="../../../">';
+  } else if (count($url) == 8) {
+    echo '<base href="../../../../">';
+  } else if (count($url) == 9) {
+    echo '<base href="../../../../../">';
+  }
+
+  ?>
 
   <title>Project Lifecycle Managemenet</title>
 
@@ -22,8 +39,11 @@
 
 <body>
   <!-- Toast -->
-  <?php echo Toast::show("show toast-onload");?>
-  
+  <?php
+  // if(!isset($_SESSION['welcome-toast']))
+  echo Toast::show("show toast-onload");
+  ?>
+
   <!-- Preloader -->
   <div class="preloader">
     <div class="lds-ripple text-center w-100">
@@ -63,7 +83,7 @@
 
           </div>
           <div class="sidebarmenu">
-            <div class="brand-logo d-flex align-items-center justify-content-center nav-logo mt-2">
+            <div class="brand-logo d-flex align-items-center justify-content-center nav-logo pt-3 pt-xl-0 mt-0 mt-xl-2">
               <a href="home" class="text-nowrap logo-img">
                 <img src="assets/images/logos/logo.png" alt="Logo" />
               </a>
@@ -72,7 +92,7 @@
             <!-- ---------------------------------- -->
             <!-- Dashboard -->
             <!-- ---------------------------------- -->
-            <nav class="sidebar-nav mt-3" id="menu-right-mini-1" data-simplebar>
+            <nav class="sidebar-nav pt-3 pt-xl-0 mt-0 mt-xl-3" id="menu-right-mini-1" data-simplebar>
               <ul class="sidebar-menu" id="sidebarnav">
                 <!-- ---------------------------------- -->
                 <!-- Dashboard -->
@@ -87,13 +107,14 @@
                 <!-- ---------------------------------- -->
                 <!-- Team -->
                 <!-- ---------------------------------- -->
-                <li class="sidebar-item">
-                  <a class="sidebar-link" href="team" aria-expanded="false">
-                    <iconify-icon icon="ri:team-fill"></iconify-icon>
-                    <span class="hide-menu">Team</span>
-                  </a>
-                </li>
-
+                <?php if (Auth::getRole() !== 'client') : ?>
+                  <li class="sidebar-item">
+                    <a class="sidebar-link" href="team" aria-expanded="false">
+                      <iconify-icon icon="ri:team-fill"></iconify-icon>
+                      <span class="hide-menu">Team</span>
+                    </a>
+                  </li>
+                <?php endif; ?>
                 <li>
                   <span class="sidebar-divider"></span>
                 </li>
@@ -106,11 +127,74 @@
                   <ul aria-expanded="false" class="collapse first-level">
                     <li class="sidebar-item">
                       <a class="sidebar-link" href="projects">
-                        <span class="icon-small"></span> Projects
+                        <iconify-icon icon="fluent:border-all-16-filled" class="text-secondary"></iconify-icon>
+                        <span class="">All projects</span>
+                      </a>
+                    </li>
+                    <span class="sidebar-divider my-0 py-0"></span>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" href="projects/create">
+                        <iconify-icon icon="solar:add-square-broken" class="text-secondary"></iconify-icon>
+                        <span class="">New project</span>
+                      </a>
+                    </li>
+                    <span class="sidebar-divider my-0 py-0"></span>
+                    <?php
+                    //                             require_once CONTROLLERS_PATH ."Projects.php";
+                    //                     if(!isset($projectDB))
+                    //                       $projectDB = new Projects();
+                    //                     Auth::getRole() === 'admin' ? $projectsMenu = $projectDB->getAdminProjects() : $projectsMenu = $projectDB->getAuthProjects();
+                    //                     if(isset($projectsMenu)){
+
+                    //                       foreach ($projectsMenu as $key => $value) {
+
+                    //                         $slug = $value->slug;
+                    //                         $projectTitle = $value->title;
+
+                    //                         echo <<<DELIMETER
+                    //                         <li class="sidebar-item">
+                    //                           <a class="sidebar-link" href="projects/single/$slug">
+                    //                             <span class="icon-small"></span> $projectTitle
+                    //                           </a>
+                    //                         </li>
+                    //                         <span class="sidebar-divider my-0 py-0"></span>
+                    // DELIMETER;
+                    //                       }
+                    //                     }
+
+                    ?>
+                  </ul>
+                </li>
+
+                <li class="sidebar-item">
+                  <a class="sidebar-link" href="tasks">
+                    <iconify-icon icon="grommet-icons:task"></iconify-icon class="text-secondary">
+                    <span class="hide-menu">Tasks</span>
+                  </a>
+                </li>
+
+                <li class="sidebar-item">
+                  <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
+                  <iconify-icon icon="ion:clipboard-outline"></iconify-icon>
+                    <span class="hide-menu">White boards</span>
+                  </a>
+                  <ul aria-expanded="false" class="collapse first-level">
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" href="whiteBoards">
+                        <iconify-icon icon="fluent:border-all-16-filled" class="text-secondary"></iconify-icon>
+                        <span class="">All boards</span>
+                      </a>
+                    </li>
+                    <span class="sidebar-divider my-0 py-0"></span>
+                    <li class="sidebar-item">
+                      <a class="sidebar-link" href="whiteBoards/create">
+                        <iconify-icon icon="solar:add-square-broken" class="text-secondary"></iconify-icon>
+                        <span class="">Create board</span>
                       </a>
                     </li>
                   </ul>
                 </li>
+
               </ul>
             </nav>
           </div>
@@ -186,10 +270,10 @@
                           </span>
                           <div class="w-75">
                             <div class="d-flex align-items-center justify-content-between">
-                              <h6 class="mb-1 fw-semibold">Launch Admin</h6>
+                              <h6 class="mb-1 fw-semibold">Danger color</h6>
                               <span class="d-block fs-2">9:30 AM</span>
                             </div>
-                            <span class="d-block text-truncate text-truncate fs-11">Just see the my new admin!</span>
+                            <span class="d-block text-truncate text-truncate fs-11">Danger notification</span>
                           </div>
                         </a>
                         <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item gap-3">
@@ -198,10 +282,10 @@
                           </span>
                           <div class="w-75">
                             <div class="d-flex align-items-center justify-content-between">
-                              <h6 class="mb-1 fw-semibold">Event today</h6>
+                              <h6 class="mb-1 fw-semibold">Primary color</h6>
                               <span class="d-block fs-2">9:15 AM</span>
                             </div>
-                            <span class="d-block text-truncate text-truncate fs-11">Just a reminder that you have event</span>
+                            <span class="d-block text-truncate text-truncate fs-11">Primary notification</span>
                           </div>
                         </a>
                         <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item gap-3">
@@ -210,10 +294,10 @@
                           </span>
                           <div class="w-75">
                             <div class="d-flex align-items-center justify-content-between">
-                              <h6 class="mb-1 fw-semibold">Settings</h6>
+                              <h6 class="mb-1 fw-semibold">Secondary color</h6>
                               <span class="d-block fs-2">4:36 PM</span>
                             </div>
-                            <span class="d-block text-truncate text-truncate fs-11">You can customize this template as you want</span>
+                            <span class="d-block text-truncate text-truncate fs-11">Secondary notification</span>
                           </div>
                         </a>
                         <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item gap-3">
@@ -222,34 +306,10 @@
                           </span>
                           <div class="w-75">
                             <div class="d-flex align-items-center justify-content-between">
-                              <h6 class="mb-1 fw-semibold">Launch Admin</h6>
+                              <h6 class="mb-1 fw-semibold">Warning color</h6>
                               <span class="d-block fs-2">9:30 AM</span>
                             </div>
-                            <span class="d-block text-truncate text-truncate fs-11">Just see the my new admin!</span>
-                          </div>
-                        </a>
-                        <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item gap-3">
-                          <span class="flex-shrink-0 bg-primary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-primary">
-                            <iconify-icon icon="solar:calendar-line-duotone"></iconify-icon>
-                          </span>
-                          <div class="w-75">
-                            <div class="d-flex align-items-center justify-content-between">
-                              <h6 class="mb-1 fw-semibold">Event today</h6>
-                              <span class="d-block fs-2">9:15 AM</span>
-                            </div>
-                            <span class="d-block text-truncate text-truncate fs-11">Just a reminder that you have event</span>
-                          </div>
-                        </a>
-                        <a href="javascript:void(0)" class="py-6 px-7 d-flex align-items-center dropdown-item gap-3">
-                          <span class="flex-shrink-0 bg-secondary-subtle rounded-circle round d-flex align-items-center justify-content-center fs-6 text-secondary">
-                            <iconify-icon icon="solar:settings-line-duotone"></iconify-icon>
-                          </span>
-                          <div class="w-75">
-                            <div class="d-flex align-items-center justify-content-between">
-                              <h6 class="mb-1 fw-semibold">Settings</h6>
-                              <span class="d-block fs-2">4:36 PM</span>
-                            </div>
-                            <span class="d-block text-truncate text-truncate fs-11">You can customize this template as you want</span>
+                            <span class="d-block text-truncate text-truncate fs-11">Warning notification</span>
                           </div>
                         </a>
                       </div>
@@ -297,19 +357,19 @@
                   <li class="nav-item dropdown">
                     <a class="nav-link" href="javascript:void(0)" id="drop1" aria-expanded="false">
                       <div class="d-flex align-items-center gap-2 lh-base">
-                        <img src="<?=strlen(Auth::getImage()) ? 'uploads/users/' . Auth::getImage() : 'assets/images/profile/' . Auth::getAvatar()?>" class="rounded-circle" width="35" height="35" alt="plm-img" />
+                        <img src="<?= Auth::getImage() ?>" class="rounded-circle" width="35" height="35" alt="plm-img" />
                         <iconify-icon icon="solar:alt-arrow-down-bold" class="fs-2"></iconify-icon>
                       </div>
                     </a>
                     <div class="dropdown-menu profile-dropdown dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                       <div class="position-relative px-4 pt-3 pb-2">
                         <div class="d-flex align-items-center mb-3 pb-3 border-bottom gap-6">
-                          <img src="<?=strlen(Auth::getImage()) ? 'uploads/users/' . Auth::getImage() : 'assets/images/profile/' . Auth::getAvatar()?>" class="rounded-circle" width="56" height="56" alt="plm-img" />
+                          <img src="<?= Auth::getImage() ?>" class="rounded-circle" width="56" height="56" alt="plm-img" />
                           <div>
-                            <h5 class="mb-0 fs-12"><?=Auth::getUsername()?> <span class="text-success fs-11"><?=ucfirst(Auth::getRole())?></span>
+                            <h5 class="mb-0 fs-12"><?= Auth::getUsername() ?> <span class="text-success fs-11"><?= ucfirst(Auth::getRole()) ?></span>
                             </h5>
                             <p class="mb-0 text-dark">
-                            <?=Auth::getEmail()?>
+                              <?= Auth::getEmail() ?>
                             </p>
                           </div>
                         </div>
@@ -317,10 +377,13 @@
                           <a href="accountSettings" class="p-2 dropdown-item h6 rounded-1">
                             Account Settings
                           </a>
-                          <a href="team" class="p-2 dropdown-item h6 rounded-1">
-                            Team
-                          </a>
-                          <a href="<?=ROOT?>/logout" class="p-2 dropdown-item h6 rounded-1">
+                          <?php if (Auth::getRole() !== 'client') : ?>
+                            <a href="team" class="p-2 dropdown-item h6 rounded-1">
+                              Team
+                            </a>
+                          <?php endif; ?>
+
+                          <a href="<?= ROOT ?>/logout" class="p-2 dropdown-item h6 rounded-1">
                             Sign Out
                           </a>
                         </div>
@@ -739,14 +802,14 @@
                   <li class="nav-item dropdown">
                     <a class="nav-link" href="javascript:void(0)" id="drop1" aria-expanded="false">
                       <div class="d-flex align-items-center gap-2 lh-base">
-                        <img src="<?=strlen(Auth::getImage()) ? 'uploads/users/' . Auth::getImage() : 'assets/images/profile/' . Auth::getAvatar()?>" class="rounded-circle" width="35" height="35" alt="plm-img" />
+                        <img src="<?= Auth::getImage() ?>" class="rounded-circle" width="35" height="35" alt="plm-img" />
                         <iconify-icon icon="solar:alt-arrow-down-bold" class="fs-2"></iconify-icon>
                       </div>
                     </a>
                     <div class="dropdown-menu profile-dropdown dropdown-menu-end dropdown-menu-animate-up" aria-labelledby="drop1">
                       <div class="position-relative px-4 pt-3 pb-2">
                         <div class="d-flex align-items-center mb-3 pb-3 border-bottom gap-6">
-                          <img src="<?=strlen(Auth::getImage()) ? 'uploads/users/' . Auth::getImage() : 'assets/images/profile/' . Auth::getAvatar()?>" class="rounded-circle" width="56" height="56" alt="plm-img" />
+                          <img src="<?= Auth::getImage() ?>" class="rounded-circle" width="56" height="56" alt="plm-img" />
                           <div>
                             <h5 class="mb-0 fs-12">David McMichael <span class="text-success fs-11">Pro</span>
                             </h5>
@@ -800,7 +863,7 @@
               <li class="sidebar-item">
                 <a class="sidebar-link has-arrow" href="javascript:void(0)" aria-expanded="false">
                   <span>
-                  <iconify-icon icon="heroicons:home-solid"></iconify-icon>
+                    <iconify-icon icon="heroicons:home-solid"></iconify-icon>
                   </span>
                   <span class="hide-menu">Dashboard</span>
                 </a>

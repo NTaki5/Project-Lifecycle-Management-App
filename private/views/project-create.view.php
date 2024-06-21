@@ -147,6 +147,7 @@ $this->view("/includes/footer");
 <script defer>
     $(".select2").select2({
         placeholder: "Select Team",
-        allowClear: true
+        allowClear: true,
+        closeOnSelect: false
     });
 </script>

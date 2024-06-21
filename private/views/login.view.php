@@ -18,7 +18,10 @@
 </head>
 
 <body>
-<?php if(isset($toast)) echo $toast;?>
+<?php
+  // if(!isset($_SESSION['welcome-toast']))
+  echo Toast::show("show toast-onload");
+  ?>
   <!-- Preloader -->
   <div class="preloader">
     <img src="<?= ROOT ?>/assets/images/logos/logo.png" alt="loader" class="lds-ripple img-fluid" />
@@ -36,26 +39,6 @@
                 </a>
                 <h2 class="mb-2 mt-4 fs-7 fw-bolder">Sign In</h2>
                 <p class="mb-9">Your Admin Dashboard</p>
-                <div class="row">
-                  <div class="col-6 mb-2 mb-sm-0">
-                    <a class="btn btn-link border border-muted d-flex align-items-center justify-content-center rounded-2 py-8 text-decoration-none" href="javascript:void(0)" role="button">
-                      <img src="<?= ROOT ?>/assets/images/svgs/google-icon.svg" alt="PLM-img" class="img-fluid me-2" width="18" height="18" />
-                      Google
-                    </a>
-                  </div>
-                  <div class="col-6">
-                    <a class="btn btn-link border border-muted d-flex align-items-center justify-content-center rounded-2 py-8 text-decoration-none" href="javascript:void(0)" role="button">
-                      <img src="<?= ROOT ?>/assets/images/svgs/facebook-icon.svg" alt="PLM-img" class="img-fluid me-2" width="18" height="18" />
-                      Facebook
-                    </a>
-                  </div>
-                </div>
-                <div class="position-relative text-center my-4">
-                  <p class="mb-0 fs-4 px-3 d-inline-block bg-body text-dark z-index-5 position-relative">
-                    or sign in with
-                  </p>
-                  <span class="border-top w-100 position-absolute top-50 start-50 translate-middle"></span>
-                </div>
                 <form method="POST">
                   <div class="mb-3">
                     <label for="inputEmail" class="form-label">Email or Username</label>
@@ -76,11 +59,11 @@
                         Remeber this Device
                       </label>
                     </div>
-                    <a class="text-primary fw-medium" href="#">Forgot Password ?</a>
+                    <a class="text-primary fw-medium" href="passwordResets">Forgot Password ?</a>
                   </div>
                   <button type="submit" class="btn btn-primary w-100 py-8 mb-4 rounded-2">Sign In</button>
                   <div class="d-flex align-items-center justify-content-center">
-                    <p class="fs-4 mb-0 fw-medium">New to PLM?</p>
+                    <p class="fs-4 mb-0 fw-medium">New to ProLifeManagement?</p>
                     <a class="text-primary fw-medium ms-2" href="<?= ROOT ?>/signup">Create an
                       account</a>
                   </div>
@@ -100,12 +83,12 @@
                   <h2 class="text-white fs-10 mb-3 lh-base">
                     Welcome to
                     <br />
-                    PLM (Prject Lifecycle Management)
+                    Project Lifecycle Management
                   </h2>
                   <span class="opacity-75 fs-4 text-white d-block mb-3">
                     your trusted partner in managing and streamlining your project lifecycle. Our mission is to provide you with the tools and support you need to plan, execute, and track your projects efficiently.
                   </span>
-                  <a href="<?= ROOT ?>/landingpage/index.html" class="btn btn-primary">Learn More</a>
+                  <a href=" <?= ROOT ?>/signup" class="btn btn-primary">Sign Up</a>
                 </div>
               </div>
             </div>

@@ -17,6 +17,10 @@
 </head>
 
 <body>
+<?php
+  // if(!isset($_SESSION['welcome-toast']))
+  echo Toast::show("show toast-onload");
+  ?>
   <!-- Preloader -->
   <div class="preloader">
     <img src=" <?= ROOT ?>/assets/images/logos/logo.png" alt="loader" class="lds-ripple img-fluid" />
@@ -104,8 +108,8 @@
                     </div>
                   <?php endif; ?>
                   <div class="mb-3">
-                    <label for="name" class="form-label">Last Name</label>
-                    <input type="text" value="<?= get_var("name") ?>" name="name" class="form-control" id="name">
+                    <label for="name" class="form-label">Name</label>
+                    <input type="text" value="<?= strlen(get_var("name"))? get_var("name") : (isset($invitationDatas->name) ? $invitationDatas->name : "");?>" name="name" class="form-control" id="name">
                     <div class="invalid-feedback">
                       <?php echo isset($errors["name"]) ? $errors["name"] : "" ?>
                     </div>
@@ -119,7 +123,7 @@
                   </div>
                   <div class="mb-3">
                     <label for="email" class="form-label">Email address</label>
-                    <input type="text" value="<?= get_var("email") ?>" name="email" class="form-control" id="email">
+                    <input type="text" value="<?= strlen(get_var("email"))? get_var("email") : (isset($invitationDatas->email) ? $invitationDatas->email : ""); ?>" name="email" class="form-control" id="email">
                     <div class="invalid-feedback">
                       <?php echo isset($errors["email"]) ? $errors["email"] : "" ?>
                     </div>
@@ -205,12 +209,12 @@
                   <h2 class="text-white fs-10 mb-3 lh-base">
                     Welcome to
                     <br />
-                    PLM
+                    ProLifeManagement
                   </h2>
                   <span class="opacity-75 fs-4 text-white d-block mb-3">
                     your trusted partner in managing and streamlining your project lifecycle. Our mission is to provide you with the tools and support you need to plan, execute, and track your projects efficiently.
                   </span>
-                  <a href=" <?= ROOT ?>/landingpage/index.html" class="btn btn-primary">Learn More</a>
+                  <a href=" <?= ROOT ?>/login" class="btn btn-primary">Sign In</a>
                 </div>
               </div>
             </div>
@@ -254,7 +258,7 @@
 
   <script>
     document.addEventListener('DOMContentLoaded', function() {
-      const avatarList = document.getElementsByClassName('avatar');
+      const avatarList = Array.from(document.getElementsByClassName('avatar'));
 
       // Add click event listener to each avatar
       avatarList.forEach(function(avatar) {

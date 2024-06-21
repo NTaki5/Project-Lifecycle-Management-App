@@ -46,7 +46,7 @@ $this->view("/includes/header");
                                     <p class="card-subtitle mb-4">Change your profile picture from here</p>
                                     <form id="profile-image-form" method="POST" enctype="multipart/form-data">
                                         <div class="text-center">
-                                            <img src="<?= strlen(Auth::getImage()) ? 'uploads/users/' . Auth::getImage() : 'assets/images/profile/' . Auth::getAvatar() ?>" alt="matdash-img" class="object-fit-cover rounded-circle" width="120" height="120">
+                                            <img src="<?= Auth::getImage() ?>" alt="matdash-img" class="object-fit-cover rounded-circle" width="120" height="120">
                                             <div class="d-flex align-items-center justify-content-center my-4 gap-6">
                                                 <a id="upload-button" class="btn btn-primary">Upload</a>
                                                 <input type="file" id="file-input" name="image" class="d-none" accept="images/*">
@@ -79,7 +79,7 @@ $this->view("/includes/header");
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-6 d-flex align-items-stretch">
+                        <div class="col-lg-6 d-flex align-items-stretch" id="password">
                             <div class="card w-100 border position-relative overflow-hidden">
                                 <div class="card-body p-4">
                                     <h4 class="card-title">Change Password</h4>
@@ -130,7 +130,7 @@ $this->view("/includes/header");
                                     <h4 class="card-title">Personal Details</h4>
                                     <p class="card-subtitle mb-4">To change your personal detail , edit and save from here</p>
                                     <span class="valid-feedback"><?= isset($successes['accountUpdated']) ? $successes['accountUpdated'] : ""; ?></span>
-                                    <form method="POST" class="needs-validation" enctype="multipart/form-data">
+                                    <form method="POST">
                                         <div class="row">
                                             <?php if (Auth::getRole() === 'admin') : ?>
                                                 <div class="mb-3 col-lg-4 col-md-6">
@@ -154,7 +154,7 @@ $this->view("/includes/header");
                                                         <?php echo isset($errors["companyAddress"]) ? $errors["companyAddress"] : "" ?>
                                                     </div>
                                                 </div>
-                                                <div class="mb-3 col-lg-12 col-md-6">
+                                                <div class="mb-3 col-lg-4 col-md-6">
                                                     <label for="companyType" class="form-label">Type of legal entity (SRL, PFA, etc.)</label>
                                                     <input type="text" value="<?= strlen(get_var("companyType")) ? get_var("companyType") : Auth::getCompanyType(); ?>" name="companyType" class="form-control" id="companyType">
                                                     <div class="invalid-feedback">
@@ -170,17 +170,10 @@ $this->view("/includes/header");
                                                 </div>
                                             </div>
                                             <div class="mb-3 col-lg-4 col-md-6">
-                                                <label for="firstname" class="form-label">First Name</label>
-                                                <input type="text" value="<?= strlen(get_var("firstname")) ? get_var("firstname") : Auth::getFirstname(); ?>" name="firstname" class="form-control" id="firstname">
+                                                <label for="name" class="form-label">Name</label>
+                                                <input type="text" value="<?= strlen(get_var("name")) ? get_var("name") : Auth::getName(); ?>" name="name" class="form-control" id="name">
                                                 <div class="invalid-feedback">
-                                                    <?php echo isset($errors["firstname"]) ? $errors["firstname"] : "" ?>
-                                                </div>
-                                            </div>
-                                            <div class="mb-3 col-lg-4 col-md-6">
-                                                <label for="lastname" class="form-label">Last Name</label>
-                                                <input type="text" value="<?= strlen(get_var("lastname")) ? get_var("lastname") : Auth::getLastname(); ?>" name="lastname" class="form-control" id="lastname">
-                                                <div class="invalid-feedback">
-                                                    <?php echo isset($errors["lastname"]) ? $errors["lastname"] : "" ?>
+                                                    <?php echo isset($errors["name"]) ? $errors["name"] : "" ?>
                                                 </div>
                                             </div>
                                             <div class="mb-3 col-lg-4 col-md-6">
@@ -199,28 +192,28 @@ $this->view("/includes/header");
                                             </div>
                                             <div class="mb-3 col-lg-4 col-md-6">
                                                 <label for="phone" class="form-label">Phone</label>
-                                                <input type="text" value="<?= get_var("phone") ?>" name="phone" class="form-control" id="phone">
+                                                <input type="text" value="<?= strlen(get_var("phone")) ? get_var("phone") : Auth::getPhone(); ?>" name="phone" class="form-control" id="phone">
                                                 <div class="invalid-feedback">
                                                     <?php echo isset($errors["phone"]) ? $errors["phone"] : "" ?>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="facebook" class="form-label">Facebook</label>
-                                                <input type="text" value="<?= get_var("facebook") ?>" name="facebook" class="form-control" id="facebook">
+                                                <input type="text" value="<?= strlen(get_var("facebook")) ? get_var("facebook") : Auth::getfacebook(); ?>" name="facebook" class="form-control" id="facebook">
                                                 <div class="invalid-feedback">
                                                     <?php echo isset($errors["facebook"]) ? $errors["facebook"] : "" ?>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="instagram" class="form-label">Instagram</label>
-                                                <input type="text" value="<?= get_var("instagram") ?>" name="instagram" class="form-control" id="instagram">
+                                                <input type="text" value="<?= strlen(get_var("instagram")) ? get_var("instagram") : Auth::getinstagram(); ?>" name="instagram" class="form-control" id="instagram">
                                                 <div class="invalid-feedback">
                                                     <?php echo isset($errors["instagram"]) ? $errors["instagram"] : "" ?>
                                                 </div>
                                             </div>
                                             <div class="mb-3">
                                                 <label for="youtube" class="form-label">YouTube</label>
-                                                <input type="text" value="<?= get_var("youtube") ?>" name="youtube" class="form-control" id="youtube">
+                                                <input type="text" value="<?= strlen(get_var("youtube")) ? get_var("youtube") : Auth::getyoutube(); ?>" name="youtube" class="form-control" id="youtube">
                                                 <div class="invalid-feedback">
                                                     <?php echo isset($errors["youtube"]) ? $errors["youtube"] : "" ?>
                                                 </div>

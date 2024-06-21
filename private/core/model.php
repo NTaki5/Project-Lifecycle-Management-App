@@ -17,15 +17,38 @@ class Model extends Database
     }
 
     public function where($column, $value){
-        $column = addslashes($column);
-        $query = "SELECT * FROM $this->table WHERE $column = :value;";
-        return $this->query($query,[
-            'value' => $value
-        ]);
+        if(!is_array($column) && !is_array($value)){
+            $column = addslashes($column);
+            $query = "SELECT * FROM $this->table WHERE $column = :value;";
+            return $this->query($query,[
+                'value' => $value
+            ]);
+        }else{
+            if (count($column) !== count($value)) {
+                throw new InvalidArgumentException("Number of columns must match number of values");
+            }
+    
+            $column = array_map('addslashes', $column);  // Ensure column names are safe
+            $conditions = [];
+            $params = [];
+    
+            foreach ($column as $index => $column) {
+                $param = ":value$index";
+                $conditions[] = "$column = $param";
+                $params["value$index"] = $value[$index];
+            }
+    
+            $conditionsStr = implode(' AND ', $conditions);
+            $query = "SELECT * FROM $this->table WHERE $conditionsStr;";
+    
+            return $this->query($query, $params);
+        }
     }
 
-    public function findAll(){
-        $query = "SELECT * FROM $this->table;";
+    public function findAll($where="" , $orderby="ASC", $limit=""){
+        $where = strlen($where) ? "WHERE " . $where : "";
+        $limit = strlen($limit) ? "LIMIT " . $limit : "";
+        $query = "SELECT * FROM $this->table $where ORDER BY '$orderby' $limit;";
         return $this->query($query);
     }
 
@@ -75,7 +98,7 @@ class Model extends Database
 
     public function hash_password($data){
         if(isset($data["password"])){
-            $data["password"] = password_hash($data["password"], PASSWORD_DEFAULT);
+            $data["password"] = password_hash($data["password"], PASSWORD_BCRYPT);
         }else{
             unset($data["password"]);
         }

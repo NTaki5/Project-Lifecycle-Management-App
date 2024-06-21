@@ -6,16 +6,9 @@ define('CONTROLLERS_PATH', '../private/controllers/');
 define('VIEWS_PATH', '../private/views/');
 define('MODELS_PATH', '../private/models/');
 
-// LOCALHOST
-// define('DB_HOST', 'localhost');
-// define('DB_USER', 'root');
-// define('DB_PASS', '');
-// define('DB_NAME', 'projectlifecyclemanagmentapp');
-
-// SERVER
-define('DB_HOST', 'projectlifecyclemanagmentapp-prolifemanagement.g.aivencloud.com');
-define('DB_USER', 'avnadmin');
-define('DB_PASS', 'AVNS_1cwcaFzsP7u87NMFIaY');
+define('DB_HOST', 'localhost');
+define('DB_USER', 'root');
+define('DB_PASS', '');
 define('DB_NAME', 'projectlifecyclemanagmentapp');
 
 define('SMTP_HOST', 'sandbox.smtp.mailtrap.io');
@@ -34,3 +27,5 @@ define('SMTP_SENDER_NAME', 'Project Lifecycle CMS');
 // hMailServer password = 51]Bn]7I:2t3
 
 //define('MAILER_PATH', '../../mailer/');
+define('WHITEBOARD_API_KEY', '09487bc11b6828137fa3eb62d001077f');
+define('BOARD_CLIENT_ID', '28512f037cfb5c5a02d676ca0e02ec18');

@@ -9,6 +9,7 @@ class Signup extends Controller{
         // WHEN I HAVE TO SAVE DATA IN DB
         if(count($_POST)){
             $user = new User();
+            $invitation = new Invitation();
             
             // GET token is set and validate user data  OR  validate user data and company data
             // Register from invitation link OR register as company
@@ -17,7 +18,6 @@ class Signup extends Controller{
                 if(isset($_GET['token']) && $userBool){
                     $_POST["date"] = date("Y-m-d");
                         $token = $_GET['token'];
-                        $invitation = new Invitation();
                         $invitationRow = $invitation->where('token', $token)[0];
 
                         if(new DateTime($invitationRow -> expires_at) < new DateTime()){
@@ -33,17 +33,44 @@ class Signup extends Controller{
                         $invitation->update($invitationRow->id,[
                             "used" => 1
                         ]);
-    
+                        $companyID = $invitationRow -> fk_company_id;
+                        if($invitationRow -> user_role == 'client'){
+                            $companyID = -1;
+                        }
+
                         $_POST["companyName"] =  "";
                         $_POST["companyCUI"] =  "";
                         $_POST["companyAddress"] =  "";
                         $_POST["companyType"] =  "";
-                        $_POST["fk_company_id"] =  $invitationRow -> fk_company_id;
+                        $_POST["fk_company_id"] = $companyID;
                         $_POST["role"] = $invitationRow -> user_role;
 
                         $_POST["image"] = isset($_FILES['image']) ? add_webp_image('uploads/users/',$_FILES['image']['name'], $_FILES['image']['tmp_name']):"";
         
                         $user->insert($_POST);
+
+                        if($invitationRow -> user_role == 'client'){
+                            $companyID = -1;
+
+                            
+                            $projectUserMap = new Project();
+                            $projectUserMap->table = "map_users_projects";
+                            $projectUserMap->allowedColumns = ['fk_user_id', 'fk_project_id'];
+
+                            $boolInsert = count($projectUserMap->insert([
+                                'fk_user_id' => $user->last_inserted_id(),
+                                'fk_project_id' => $invitationRow->fk_project_id
+                            ]));
+        
+                            if ($boolInsert) {
+                                new Toast("The project could not be created", "Try again later");
+                                $projectDB = new Project();
+                                $projectDB->delete($invitationRow->fk_project_id);
+                                $projectUserMap->delete($invitationRow->fk_project_id, 'fk_project_id');
+                            }
+                        }
+
+
                         $this->redirect("login");
         
                 }
@@ -101,20 +128,22 @@ class Signup extends Controller{
             // }
         }
 
+        $invitationDatas = array();
         if(isset($_GET['token'])){
             $invitation = new Invitation();
             $token = $_GET['token'];
-            if(!($rowInvitation = $invitation->where('token', $token)[0])){
+            if(!($invitationDatas = $invitation->where('token', $token)[0])){
                 $this->redirect('login');
             }
 
-            if($rowInvitation->used){
+            if($invitationDatas->used){
                 $this->redirect('login');
             }
             
         }
-
+        
         $this->view("signup", [
+            'invitationDatas' => $invitationDatas,
             'errors' => $errors
         ]);
     }

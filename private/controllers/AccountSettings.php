@@ -17,15 +17,19 @@ class AccountSettings extends Controller{
                 if($user -> passwordResetValidate($_POST)){
                     $user->update(Auth::getId(), $_POST);
                     $successes['resetPassword'] = "Password successfully changed!";
+                    new Toast("Password successfully changed!");
                     Auth::authenticate($user->where('id', Auth::getId())[0]);
                 }else{
                     $errors = $user->errors;
+                    new Toast("Your password update failed.", "Try again!");
                 }
+                // new Toast("Password successfully changed!");
 
             }
             if(isset($_POST['edit-account-details'])){
                 $companyBool = $company -> validate($_POST);
                 $userBool = $user -> validate($_POST);
+
                 
                 // Authenticated User is NOT ADMIN and validate user data  OR  validate user data and company data
                 // Register from invitation link OR register as company
@@ -36,24 +40,24 @@ class AccountSettings extends Controller{
     
                     $company->update(Auth::getFk_company_id(), $_POST);
                     $user->update(Auth::getId(), $_POST);
-                    Auth::authenticate($user->where('id', Auth::getId())[0]);
+                    Auth::authenticate($user->where('id', Auth::getId())[0]);   
                     // print_r($_SESSION['USER']);die();
                     $successes['accountUpdated'] = "Account successfully updated!";
+                    new Toast("Account successfully updated!");
                 }else{
                     // errors
                     $errors = $company->errors;
                     $errors = array_merge($errors, $user->errors);
+                    new Toast("Your profile update failed.", "Try again!");
                 }
-                new Toast("Account successfully updated!");
-                $this->redirect('accountSettings#account-details');
+                // $this->redirect('accountSettings#account-details');
             }
             // Avatar or Image, or both
             if(isset($_POST['update-profile-image'])){
                 if(isset($_FILES['image']) && strlen($_FILES['image']['tmp_name'])){
-                    $dbImage = Auth::getImage();
-                    if(strlen($dbImage)){
-                        unlink("uploads/users/" . $dbImage);
-                    }
+                    if(file_exists(Auth::getImage(true)))
+                        unlink(Auth::getImage(true));
+                    
 
                     $_POST["image"] = isset($_FILES['image']) ? add_webp_image('uploads/users/',$_FILES['image']['name'], $_FILES['image']['tmp_name']):"";
 
@@ -65,13 +69,12 @@ class AccountSettings extends Controller{
             }
 
             if(isset($_POST['delete-image'])){
-                $dbImage = Auth::getImage();
-                if(strlen($dbImage)){
-                    unlink("uploads/users/" . $dbImage);
-                }
+                if(file_exists(Auth::getImage(true)))
+                        unlink(Auth::getImage(true));
 
                 $_POST["image"] = "";
                 $user->update(Auth::getId(), $_POST);
+                new Toast("Profile image successfully updated!");
                 Auth::authenticate($user->where('id', Auth::getId())[0]);
             }
         }

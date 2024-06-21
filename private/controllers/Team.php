@@ -6,6 +6,9 @@ class Team extends Controller
 
     public function index()
     {
+        if(Auth::getRole() === 'client')
+            $this->redirect('home');
+
         $errors = array();
         $invitations = new Invitation();
         $user = new User();
@@ -22,9 +25,11 @@ class Team extends Controller
 
             try {
 
-                if(!$invitations->uniqueValue('email', $email))
-                    throw new Exception("We have already sent an invitation to this email address.", 999);
-
+                if(!$invitations->uniqueValue('email', $email)){
+                    new Toast("We have already sent an invitation to this email address.", 999);
+                    echo "Fail invitation sent";
+                    exit();
+                }
 
                 $emailSubject = "CMS Invitation";
                 $emailBody = 'Hello, ' . $name . '! You have been invited to the ' . Auth::getCompanyName() . ' company. <br>
@@ -38,12 +43,12 @@ class Team extends Controller
                 
                 $invitations->insert([
                     "fk_company_id" => Auth::getFk_company_id(),
-                    "fk_project_id" => 2,
+                    "fk_project_id" => -1,
                     "name" => $name,
                     "email" => $email,
                     "phone" => $phone,
                     "token" => $token,
-                    "expires_at" => date('Y-m-d', strtotime('+48 hours')),
+                    "expires_at" => date('Y-m-d H:i:s',time() + (48 * 60 * 60)),
                     "user_role" => "employee"
                 ]);
                 Toast::setToast("Invitation has been sent", "");
@@ -127,22 +132,46 @@ class Team extends Controller
 
             if (!isset($_POST['email'])) exit();
             if (empty($user->where('email', $_POST['email']))) {
+                // THEN watch the invitations list, and delete the invitation
                 if (empty($invitations->where('email', $_POST['email']))) {
                     exit();
                 }
                 
                 $invitationId = $invitations->where('email', $_POST['email'])[0]->id;
-                
                 $boolUpdate = $invitations->delete($invitationId);
 
             }else{
-                $userId = $user->where('email', $_POST['email'])[0]->id;
+                $userDetails = $user->where('email', $_POST['email'])[0];
+                $userId = $userDetails->id;
+                $userCompanyId = $userDetails->fk_company_id;
 
                 // tests for more precision delete from database
                 if(!isset($_POST['userId']) || !isset($userId)) exit();
 
                 if((int)$_POST['userId'] !== (int)$userId) exit();
                 
+                $userMaps = new User();
+                $userMaps->table = "map_users_projects";
+                $userMaps->delete('fk_user_id', $userId);
+
+                $userMaps->table = "map_users_tasks";
+                $userMaps->delete('fk_user_id', $userId);
+
+                $userMaps->table = "map_feed_user_likes";
+                $userMaps->delete('fk_user_id', $userId);
+
+                $userMaps->table = "map_comment_user_likes";
+                $userMaps->delete('fk_user_id', $userId);
+
+                $userMaps->table = "feeds";
+                $userMaps->delete('fk_user_id', $userId);
+
+                $userMaps->table = "comments";
+                $userMaps->delete('fk_user_id', $userId);
+
+                $userMaps->table = "companys";
+                $userMaps->delete('id', $userCompanyId);
+
                 $boolUpdate = $user->delete($userId);
                 if($userId === Auth::getId()) Auth::logout();
             }

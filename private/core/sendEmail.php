@@ -33,6 +33,7 @@ class SendEmail extends PHPMailer{
 
          // Comment this IF, if you need to check the real error in case that email not sent
          $this->send();
+         return true;
     }
 
 }

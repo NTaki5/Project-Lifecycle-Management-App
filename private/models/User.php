@@ -18,11 +18,21 @@ class User extends Model
             $this->errors["username"] = "You must give us the username";
             $return = false;
         }
+        else 
+            if(Auth::is_logged_in()){
+                if(count($usernameUserID = $user->where('username', $data["username"]))) {
+                    if($usernameUserID[0]->id != Auth::getId() && $usernameUserID[0]->fk_company_id == Auth::getFk_company_id()){
+                        $this->errors["username"] = "This username already exists";
+                        $return = false;
+                    }
+                }
+            }else{
+                if(!$user->uniqueValue('username', $data["username"])) {
+                    $this->errors["username"] = "This username already exists";
+                    $return = false;
+                }
+            }
 
-        if(!$user->uniqueValue('username', $data["username"])) {
-            $this->errors["username"] = "This username already exists";
-            $return = false;
-        }
 
         if (isset($data["occupation"]) && empty($data["occupation"])) {
             $this->errors["occupation"] = "You must give us the occupation";
@@ -50,13 +60,26 @@ class User extends Model
             $this->errors["email"] = "Email is not valid";
             $return = false;
         }
+        else
+            if(Auth::is_logged_in()){
+                if(count($emailUserID = $user->where('email', $data["email"]))) {
+                    if($emailUserID[0]->id != Auth::getId() && $emailUserID[0]->fk_company_id == Auth::getFk_company_id()){
+                        $this->errors["email"] = "This email already exists";
+                        $return = false;
+                    }
+                }
+            }else{
+                if($user->uniqueValue('email', $data["email"])) {
+                    $this->errors["email"] = "This email already exists";
+                    $return = false;
+                }
+            }
+        // if(!$user->uniqueValue('email', $data["email"])) {
+        //     $this->errors["email"] = "This email already exists";
+        //     $return = false;
+        // }
 
-        if(!$user->uniqueValue('email', $data["email"])) {
-            $this->errors["email"] = "This email already exists";
-            $return = false;
-        }
-
-        if (empty($data["phone"]) || !preg_match('/^\+?[0-9]\d{1,14}$/', $data["phone"])) {
+        if (empty($data["phone"]) || !preg_match('/^\+?[0-9]\d{10,14}$/', $data["phone"])) {
             $this->errors["phone"] = "Phone is not valid";
             $return = false;
         }

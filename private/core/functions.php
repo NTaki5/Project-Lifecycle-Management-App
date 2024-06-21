@@ -273,5 +273,37 @@ function get_avatars(){
 }
 
 function generateToken() {
-    return bin2hex(random_bytes(16));
+    return bin2hex(random_bytes(32));
+}
+
+function getFormattedDate($date) {
+    // Convert the date string to a timestamp
+    $timestamp = strtotime($date);
+
+    // Format the day with the appropriate suffix
+    $day = date('j', $timestamp);
+    if ($day == 1 || $day == 21 || $day == 31) {
+        $daySuffix = 'st';
+    } elseif ($day == 2 || $day == 22) {
+        $daySuffix = 'nd';
+    } elseif ($day == 3 || $day == 23) {
+        $daySuffix = 'rd';
+    } else {
+        $daySuffix = 'th';
+    }
+
+    // Format the date with the day suffix
+    $formattedDate = date('l, F j', $timestamp) . $daySuffix . date(', Y', $timestamp);
+
+    return $formattedDate;
+}
+
+function findInObjectsArrayById($objectsArray, $findThat, $toBeEqualWith) {
+    $returnArray = array();
+    foreach ($objectsArray as $value) {
+        if ($value->$findThat == $toBeEqualWith) {
+            array_push($returnArray, $value);
+        }
+    }
+    return $returnArray ; // Return null if value not found
 }

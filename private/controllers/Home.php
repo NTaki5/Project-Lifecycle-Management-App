@@ -9,7 +9,7 @@ class Home extends Controller{
         $user = new User(); //autoload in config.php
         $data = isset($user->where('id',Auth::getId())[0]) ? $user->where('id',Auth::getId()) : $this->redirect("login");
 
-        $toast = new Toast(Auth::getUsername(), "How are you today?");
+        // !isset($_SESSION['welcome-toast']) ? new Toast(Auth::getUsername(), "How are you today?") : "";
         
         $this->view("home", (array)$data[0]);
 

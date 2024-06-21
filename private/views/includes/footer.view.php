@@ -1,15 +1,10 @@
 </div>
-<button class="btn btn-danger p-3 rounded-circle d-flex align-items-center justify-content-center customizer-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasExample" aria-controls="offcanvasExample">
+<button class="btn btn-secondary p-3 rounded-circle d-flex align-items-center justify-content-center customizer-btn" type="button">
     <i class="icon ti ti-settings fs-7"></i>
 </button>
 
 <div class="offcanvas customizer offcanvas-end" tabindex="-1" id="offcanvasExample" aria-labelledby="offcanvasExampleLabel">
-    <div class="d-flex align-items-center justify-content-between p-3 border-bottom">
-        <h4 class="offcanvas-title fw-semibold" id="offcanvasExampleLabel">
-            Settings
-        </h4>
-        <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-    </div>
+
     <div class="offcanvas-body" data-simplebar style="height: calc(100vh - 80px)">
         <h6 class="fw-semibold fs-4 mb-2">Theme</h6>
 
@@ -146,11 +141,11 @@
     </div>
 </div>
 
-<script>
-    function handleColorTheme(e) {
-        document.documentElement.setAttribute("data-color-theme", e);
-    }
-</script>
+    <script>
+        function handleColorTheme(e) {
+            document.documentElement.setAttribute("data-color-theme", e);
+        }
+    </script>
 </div>
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered">
@@ -191,10 +186,9 @@
   <!-- solar icons -->
   <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
   <script src="assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-  <script src="assets/js/dashboards/dashboard1.js"></script>
+  <!-- <script src="assets/js/dashboards/dashboard1.js"></script> -->
   <script src="assets/libs/fullcalendar/index.global.min.js"></script>
-  <script src="assets/js/apps/team.js"></script>
-  <script src="assets/js/dashboards/my-dashboard.js"></script>
+    <script src="assets/js/apps/kanban.js"></script>
 
 </body>
 

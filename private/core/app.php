@@ -5,27 +5,22 @@ class App
     protected $controller = 'Home';
     protected $method = 'index';
     protected $params = array();
+    protected $projectsMenu = array();
+    protected $tasksMenu = array();
 
     public function __construct()
     {
-        $url = explode("/", "$_SERVER[REQUEST_URI]");
-        if (count($url) == 5) {
-            echo '<base href="../">';
-        } else if (count($url) == 6) {
-            echo '<base href="../../">';
-        } else if (count($url) == 7) {
-            echo '<base href="../../../">';
-        } else if (count($url) == 8) {
-            echo '<base href="../../../../">';
-        } else if (count($url) == 9) {
-            echo '<base href="../../../../../">';
-        }
+        // Check if session is started and active, if not, then set the params 
+        session_set_cookie_params([
+            'lifetime' => 5000, // big number, because I check belove the session time
+            'secure' => false, // Change to true if you are using HTTPS
+            'httponly' => true, // This helps mitigate XSS attacks
+        ]);
 
-
-        require CONTROLLERS_PATH . "SessionTimeout.php";
-        new SessionTimeout();
-
+        session_start();
+        
         $URL = $this->getUrl();
+        new SessionTimeout();
         // Search for Controller
         if (file_exists(CONTROLLERS_PATH . ucfirst($URL[0]) . ".php")) {
             $this->controller =  ucfirst($URL[0]);
@@ -60,7 +55,6 @@ class App
 
     private function getUrl()
     {
-
         // var_dump($_GET);
         // If not exist any GET parameter, return home page
         $GETurl = isset($_GET['url']) ? $_GET['url'] : "";
@@ -70,10 +64,11 @@ class App
         if (Auth::is_logged_in()) {
             if ((strtolower($urlArr[0]) === 'login' || strtolower($urlArr[0]) === 'signup') && !isset($_GET['token'])) {
                 return ['home'];
+                
             }
         } else 
-            if (strtolower($urlArr[0]) !== 'login' && strtolower($urlArr[0]) !== 'signup')
-            return ['login'];
+            if (strtolower($urlArr[0]) !== 'login' && strtolower($urlArr[0]) !== 'signup' && strtolower($urlArr[0]) !== 'passwordresets')
+                header("Location: " . ROOT . "/login");
 
         if (strtolower($urlArr[0]) === 'signup' && isset($_GET['token']))
             Auth::logout();
