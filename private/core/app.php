@@ -10,17 +10,8 @@ class App
 
     public function __construct()
     {
-        // Check if session is started and active, if not, then set the params 
-        session_set_cookie_params([
-            'lifetime' => 5000, // big number, because I check belove the session time
-            'secure' => false, // Change to true if you are using HTTPS
-            'httponly' => true, // This helps mitigate XSS attacks
-        ]);
-
-        session_start();
-        
+        date_default_timezone_set('Europe/Bucharest');
         $URL = $this->getUrl();
-        new SessionTimeout();
         // Search for Controller
         if (file_exists(CONTROLLERS_PATH . ucfirst($URL[0]) . ".php")) {
             $this->controller =  ucfirst($URL[0]);
@@ -61,11 +52,13 @@ class App
 
         $urlArr = strlen($GETurl) ? explode('/', filter_var(trim($GETurl, '/'), FILTER_SANITIZE_URL)) : ['home'];
 
+        new SessionTimeout();
         if (Auth::is_logged_in()) {
             if ((strtolower($urlArr[0]) === 'login' || strtolower($urlArr[0]) === 'signup') && !isset($_GET['token'])) {
                 return ['home'];
                 
             }
+            
         } else 
             if (strtolower($urlArr[0]) !== 'login' && strtolower($urlArr[0]) !== 'signup' && strtolower($urlArr[0]) !== 'passwordresets')
                 header("Location: " . ROOT . "/login");

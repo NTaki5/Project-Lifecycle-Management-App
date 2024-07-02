@@ -7,48 +7,52 @@ $(function () {
 
   $('[data-btn-action="addTask"]').prop("disabled", true);
 
+async function membersFromProject(projectID, returnMembers = false){
+        // get Team Members from the project
+        const response = await $.ajax({
+          url: "tasks",
+          type: "POST",
+          data: {
+            "get-members-fromProject": true,
+            projectID: projectID,
+          }
+        });
+
+        if (response !== undefined) {
+
+          if(returnMembers)
+            return JSON.parse(response);
+
+          refTeam.innerHTML = "";
+          var newOption = document.createElement("option");
+          newOption.value = "";
+          newOption.text = "Choose...";
+          refTeam.appendChild(newOption);
+          JSON.parse(response).forEach((element) => {
+            var newOption = document.createElement("option");
+            newOption.value = element["userId"];
+            newOption.text =
+              element["userName"] +
+              (element["userRole"] == "client" ? "(client)" : "");
+            refTeam.appendChild(newOption);
+          });
+        }
+}
+  
+if(refProject){
   refProject.addEventListener("change", function (event) {
     if (event.target.value.length) {
       projectBool = true;
       refTeam.removeAttribute("disabled");
-      // get Team Members to the project
-      $.ajax({
-        url: "tasks",
-        type: "POST",
-        data: {
-          "get-members-fromProject": true,
-          projectID: event.target.value,
-        },
-        success: function (response) {
-          if (response !== undefined) {
-            refTeam.innerHTML = "";
-
-            var newOption = document.createElement("option");
-            newOption.value = "";
-            newOption.text = "Choose...";
-            refTeam.appendChild(newOption);
-            JSON.parse(response).forEach((element) => {
-              var newOption = document.createElement("option");
-              newOption.value = element["userId"];
-              newOption.text =
-                element["userName"] +
-                (element["userRole"] == "client" ? "(client)" : "");
-              refTeam.appendChild(newOption);
-            });
-          }
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          console.log(response);
-        },
-      });
+      membersFromProject(event.target.value);
     } else {
       $('[data-btn-action="addTask"]').prop("disabled", true);
       refTeam.setAttribute("disabled", "");
       projectBool = false;
     }
-    if (projectBool)
-      $('[data-btn-action="addTask"]').removeAttr("disabled");
+    if (projectBool) $('[data-btn-action="addTask"]').removeAttr("disabled");
   });
+}
   // END form dependencies
 
   // ----------------------------------------------------------------------
@@ -63,11 +67,10 @@ $(function () {
       refreshPosition: true,
       stop: function (event, ui) {},
       update: function (event, ui) {
-        var taskStatus = ui.item
+        var fk_category_id = ui.item
           .closest(".task-list-container")
-          .attr("data-item")
-          .split("-")[1];
-        console.log(taskStatus);
+          .attr("data-taskCategory-id");
+        console.log(fk_category_id);
         console.log(ui);
         console.log(ui.item);
 
@@ -79,7 +82,7 @@ $(function () {
           data: {
             "update-status": true,
             taskID: taskID,
-            taskStatus: taskStatus,
+            fk_category_id: fk_category_id,
           },
           success: function (response) {
             if (response !== undefined) {
@@ -121,6 +124,15 @@ $(function () {
   function addKanbanItem() {
     $(".addTask").on("click", function (event) {
       event.preventDefault();
+
+      document.getElementById("kanban-title").value = "";
+      document.getElementById("kanban-text").value = "";
+      document.getElementById("projectSelect").selectedIndex = 0;
+      document.getElementById("teamSelect").selectedIndex = -1;
+
+      taskCategoryID = $(this)
+      .parents('[data-action="sorting"]')
+      .attr("data-taskcategory-id");
       getParentElement = $(this)
         .parents('[data-action="sorting"]')
         .attr("data-item");
@@ -129,18 +141,18 @@ $(function () {
       $('[data-btn-action="addTask"]').show();
       $('[data-btn-action="editTask"]').hide();
       $("#addItemModal").modal("show");
-      kanban_add(getParentElement);
+      kanban_add(getParentElement,taskCategoryID);
     });
   }
 
   // ----------------------------------------------------------------------
   //   add default item
   // ----------------------------------------------------------------------
-  function kanban_add(getParent) {
+  function kanban_add(getParent, taskCategoryID) {
     $('[data-btn-action="addTask"]')
       .off("click")
       .on("click", function (event) {
-        getAddBtnClass = $(this).attr("class").split(" ")[1];
+        // getAddBtnClass = $(this).attr("class").split(" ")[1];
 
         var today = new Date();
         var dd = String(today.getDate()).padStart(2, "0");
@@ -175,6 +187,7 @@ $(function () {
         var teamMembers = itemTeam.map(function (option) {
           return option.value;
         });
+
         $.ajax({
           url: "tasks",
           type: "POST",
@@ -183,9 +196,11 @@ $(function () {
             title: itemTitle,
             description: itemText,
             fk_project_id: itemProject,
+            fk_category_id: taskCategoryID,
             teamMembers: teamMembers,
           },
           success: function (response) {
+            console.log(response);
             if (response !== undefined) {
               insertedTaskId = JSON.parse(response)["insertedTaskId"];
               projectName = JSON.parse(response)["projectName"];
@@ -259,10 +274,10 @@ $(function () {
           },
           error: function (jqXHR, textStatus, errorThrown) {
             if (jqXHR.status === 400) {
+              console.log(response);
               // Parse the JSON response
               var response = JSON.parse(jqXHR.responseText);
               if (response.code === 999 && response.value !== undefined) {
-                console.log(response);
                 // document.location.reload();
               }
             }
@@ -291,12 +306,7 @@ $(function () {
   // ----------------------------------------------------------------------
   $(".add-list")
     .off("click")
-    .on("click", function (event) {
-      var today = new Date();
-      var dd = String(today.getDate()).padStart(2, "0");
-      var mm = String(today.getMonth() + 1).padStart(2, "0");
-
-      today = mm + "." + dd;
+    .on("click", function (event) { 
 
       var itemTitle = document.getElementById("item-name").value;
 
@@ -307,6 +317,8 @@ $(function () {
       item_html =
         '<div data-item="item-' +
         itemDataAttr +
+        '" data-taskCategory-id = "'+
+        taskCategoryID+
         '" class="task-list-container  mb-4 " data-action="sorting">' +
         '<div class="connect-sorting">' +
         '<div class="task-container-header">' +
@@ -356,7 +368,7 @@ $(function () {
     });
 
   // ----------------------------------------------------------------------
-  // edit item
+  // edit list
   // ----------------------------------------------------------------------
   function editItem() {
     $(".list-edit")
@@ -376,11 +388,6 @@ $(function () {
           url: "tasks",
           type: "POST",
           data: {
-            "create-task": true,
-            title: itemTitle,
-            description: itemText,
-            fk_project_id: itemProject,
-            teamMembers: itemTeam,
           },
           success: function (response) {
             if (response !== undefined) {
@@ -500,54 +507,56 @@ $(function () {
   // Delete item on click
   // ----------------------------------------------------------------------
   function kanbanDelete() {
-        $(".card .kanban-item-delete")
+    $(".card .kanban-item-delete")
       .off("click")
       .on("click", function (event) {
         event.preventDefault();
-          get_card_parent = $(this).closest(".card");
-          
-          Swal.fire({
-            title: "Are you sure?",
-            text: "You won't be able to revert this!",
-            type: "warning",
-            showCancelButton: true,
-            confirmButtonColor: "#3085d6",
-            cancelButtonColor: "#d33",
-            confirmButtonText: "Yes, delete it!",
-          }).then((result) => {
-            if (result.value) {
+        get_card_parent = $(this).closest(".card");
 
-              var taskID = get_card_parent
-              .find("div")
-              .attr("data-task-id");
+        Swal.fire({
+          title: "Are you sure?",
+          text: "You won't be able to revert this!",
+          type: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Yes, delete it!",
+        }).then((result) => {
+          if (result.value) {
+            var taskID = get_card_parent.find("div").attr("data-task-id");
 
-                $.ajax({
-                  url: "tasks",
-                  type: "POST",
-                  data: {
-                    "delete-task": true,
-                    "taskID": taskID
-                  },
-                  success: function (response) {
-                    console.log(response);
-                    if(!response.length)
-                    {  
-                      get_card_parent
-                      .remove();
-                      console.log(taskID);
+            $.ajax({
+              url: "tasks",
+              type: "POST",
+              data: {
+                "delete-task": true,
+                taskID: taskID,
+              },
+              success: function (response) {
+                console.log(response);
+                if (!response.length) {
+                  get_card_parent.remove();
+                  console.log(taskID);
 
-                      Swal.fire("Deleted!", "Your task has been deleted.", "success");
-                    }else
-                      Swal.fire("Error!", "Your task has not been deleted.", "fail");
-                    
-                  },
-                  error: function (jqXHR, textStatus, errorThrown) {
-                      Swal.fire("Error!", "Your task has not been deleted.", "fail");
-                  },
-                });
-            }
-          });
+                  Swal.fire(
+                    "Deleted!",
+                    "Your task has been deleted.",
+                    "success"
+                  );
+                } else
+                  Swal.fire(
+                    "Error!",
+                    "Your task has not been deleted.",
+                    "fail"
+                  );
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                Swal.fire("Error!", "Your task has not been deleted.", "fail");
+              },
+            });
+          }
         });
+      });
     // $(".card .kanban-item-delete")
     //   .off("click")
     //   .on("click", function (event) {
@@ -583,8 +592,6 @@ $(function () {
         var get_kanban_title = $(".task-text-progress #kanban-title").val(
           itemTitle
         );
-        
-        console.log(itemTitle);
 
         var itemText = parentItem
           .parents(".card")
@@ -595,15 +602,99 @@ $(function () {
         );
 
         var taskID = parentItem
-        .parents(".card")
-        .find("div")
-        .attr("data-task-id");
+          .parents(".card")
+          .find("div")
+          .attr("data-task-id");
 
         $(".add-task-title").hide();
         $(".edit-task-title").show();
 
         $('[data-btn-action="addTask"]').hide();
         $('[data-btn-action="editTask"]').show();
+
+        $projectsFromCompany = "";
+        $.ajax({
+          url: "tasks",
+          type: "POST",
+          data: {
+            "get-projects-fromCompany": true,
+          },
+          success: function (response) {
+            if (response !== undefined) {
+              $projectsFromCompany = JSON.parse(response);
+            }
+
+            // GET THE MEMBERS WHO working on tasks
+            $.ajax({
+              url: "tasks",
+              type: "POST",
+              data: {
+                "get-membersAndProject-associated-with-Task": true,
+                taskID: taskID,
+              },
+              success: function (response) {
+                if (response !== undefined) {
+                  $selectedMembers = JSON.parse(response)[0];
+                  $selectedProjectID = JSON.parse(response)[1][0];
+                  refProject.innerHTML = "";
+                  var newOption = document.createElement("option");
+                  newOption.value = "";
+                  newOption.text = "Choose...";
+                  refProject.appendChild(newOption);
+                  
+                  $projectsFromCompany.forEach((project) => {
+                    var newOption = document.createElement("option");
+                    newOption.value = project["id"];
+                    newOption.text = project["title"];
+
+                    if ($selectedProjectID  == project["id"]) {
+                      newOption.setAttribute("selected", "");
+                    }
+                    refProject.appendChild(newOption);
+                  });
+
+                  refTeam.innerHTML = "";
+                  var newOption = document.createElement("option");
+                  newOption.value = "";
+                  newOption.text = "Choose...";
+                  refTeam.appendChild(newOption);
+
+                  (async () => {
+                    const projectMembers = await membersFromProject($selectedProjectID, true);
+                    
+                    projectMembers.forEach((member) => {
+                        var newOption = document.createElement("option");
+                        newOption.value = member["userId"];
+                        newOption.text =
+                          member["userName"] +
+                          (member["userRole"] == "client" ? "(client)" : "");
+
+                          $selectedMembers.forEach((element) => {
+                            if (element['userId'] == (member['userId'])) {
+                              newOption.setAttribute("selected", "");
+                            }
+                          });
+                          
+                          
+
+                          
+  
+                        refTeam.appendChild(newOption);
+                    });
+                  })();
+                  
+                }
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                console.log(response);
+              },
+            });
+          },
+          error: function (jqXHR, textStatus, errorThrown) {
+            console.log(response);
+          },
+        });
+
 
         $('[data-btn-action="editTask"]')
           .off("click")
@@ -619,7 +710,7 @@ $(function () {
             var itemTeam = itemTeam.map(function (option) {
               return option.value;
             });
-
+            console.log(itemTeam);
             $.ajax({
               url: "tasks",
               type: "POST",
@@ -635,7 +726,10 @@ $(function () {
                 if (response !== undefined) {
                   console.log(response);
 
-                  // document.location.reload();
+                  toast = JSON.parse(response)["toast"];
+
+                  document.body.insertAdjacentHTML("afterbegin", toast);
+                  hideElement(".toast.show");
                 }
               },
               error: function (jqXHR, textStatus, errorThrown) {
@@ -648,11 +742,6 @@ $(function () {
                   }
                 }
               },
-            }).always(function () {
-              console.log("ALWAYS");
-              var container = document.createElement("div");
-              container.innerHTML = '<?= Toast::show("show toast-onload");?>';
-              document.body.appendChild(container.firstChild);
             });
 
             var kanbanValueTitle =
@@ -669,10 +758,10 @@ $(function () {
               .html(kanbanValueTitle);
             var itemTextDataAttr = parentItem
               .parents(".card")
-              .find('.task-content div')
+              .find(".task-content div")
               .attr("data-item-text", kanbanValueText);
 
-              parentItem
+            parentItem
               .parents(".card")
               .find(".task-content div")
               .html(kanbanValueText);
@@ -681,7 +770,6 @@ $(function () {
               .parents(".card")
               .find('p:not(".progress-count")')
               .html(kanbanValueText);
-
 
             $("#addItemModal").modal("hide");
             var setDate = $(".taskDate").html("");

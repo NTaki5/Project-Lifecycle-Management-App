@@ -52,7 +52,7 @@ $this->view("/includes/header");
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="start_date" name="start_date" value="<?= get_var("start_date") ?>"/>
+                                    <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="<?= get_var("start_date") ?>"/>
                                     <label for="start_date">Start Date *</label>
                                     <div class="invalid-feedback">
                                         <?php echo isset($errors["start_date"]) ? $errors["start_date"] : "" ?>
@@ -61,7 +61,7 @@ $this->view("/includes/header");
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="end_date" name="end_date" value="<?= get_var("end_date") ?>"/>
+                                    <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="<?= get_var("end_date") ?>"/>
                                     <label for="end_date">End Date *</label>
                                     <div class="invalid-feedback">
                                         <?php echo isset($errors["end_date"]) ? $errors["end_date"] : "" ?>

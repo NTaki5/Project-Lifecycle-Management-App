@@ -19,6 +19,8 @@ class Tasks extends Controller{
         $projectUserMap->allowedColumns = ['fk_user_id', 'fk_project_id'];
 
         $taskDB = new Task();
+        $taskCategoriesDB = new Task();
+        $taskCategoriesDB->allowedColumns =["name", "priority", "active", "fk_project_id"];
         $taskUserMap = new Task();
         $taskUserMap->table = "map_users_tasks";
         $taskUserMap->allowedColumns = ['fk_user_id', 'fk_task_id'];
@@ -28,31 +30,28 @@ class Tasks extends Controller{
             if (count($_POST)) {
                 if (isset($_POST['create-task'])) {
                     try {
-
-                        $_POST['title'] = htmlspecialchars($_POST['title']);
-                        $_POST['description'] = htmlspecialchars($_POST['description']);
-
-                        $_POST['status'] = 'todo';
                         $_POST['fk_company_id'] = Auth::getFk_company_id();
-                        $_POST['priority'] = count($taskDB->findAll("DESC", "1")) ? ($taskDB->findAll("DESC", "1")[0]->priority + 1) : 1;
+                        $_POST['createdBy_id'] = Auth::getId();
+                        $_POST['priority'] = count($taskDB->findAll(orderby:"priority DESC", limit:"1")) ? ($taskDB->findAll(orderby:"priority DESC", limit:"1")[0]->priority + 1) : 1;
 
-                        // print_r($_POST);
-                        // exit();
                         if (count($taskDB->insert($_POST))) {
                             new Toast("The task could not be created.");
                             exit();
                         }
 
                         $lastTaskId = $taskDB->last_inserted_id();
-                        $teamMembers = $_POST['teamMembers'];
 
-                        foreach ($teamMembers as $key => $value) {
-                            if (count($taskUserMap->insert([
-                                "fk_user_id" => $value,
-                                "fk_task_id" => $lastTaskId
-                            ]))) {
-                                $taskUserMap->delete($lastTaskId, 'fk_task_id');
-                                $taskDB->delete($lastTaskId);
+                        if(isset($_POST['teamMembers'])){
+                            $teamMembers = $_POST['teamMembers'];
+
+                            foreach ($teamMembers as $key => $value) {
+                                if (count($taskUserMap->insert([
+                                    "fk_user_id" => $value,
+                                    "fk_task_id" => $lastTaskId
+                                ]))) {
+                                    $taskUserMap->delete($lastTaskId, 'fk_task_id');
+                                    $taskDB->delete($lastTaskId);
+                                }
                             }
                         }
 
@@ -89,13 +88,40 @@ class Tasks extends Controller{
                         $taskID = $_POST['taskID'];
 
                         // check fk_keys is set, if not, unset the $_POST fk values;
-                        if (isset($_POST['fk_project_id']) && $_POST['fk_project_id'] <= 0)
-                        unset($_POST['fk_project_id']);
+                        if (isset($_POST['fk_project_id']) && $_POST['fk_project_id'] <= 0){
+                            unset($_POST['fk_project_id']);
+                            new Toast("The task could not be saved.");
+                            $this->redirect('home');         
+                        }
 
-                        $_POST['title'] = htmlspecialchars($_POST['title']);
-                        $_POST['description'] = htmlspecialchars($_POST['description']);
+                        if($taskCategoryID = $taskDB->where(["id"], [$_POST['taskID']])[0]->fk_category_id){
 
-                        if (count($taskDB->update($_POST['taskID'], $_POST))) {
+                                $taskCategory = $taskCategoriesDB->getTaskCategoryWhere(['id'], [$taskCategoryID])[0];
+                                $taskCategoryName = $taskCategory->name;
+                                $taskCategoryPriority = $taskCategory->priority;
+                                $taskCategoryActive = $taskCategory->active;
+
+
+                                // Ha nem letezik hasonlo elnevezesu feladat kategoria abban a projektben, ahova at akarom koltoztetni
+                                // a feladatot, akkor letrehozok                                
+
+                                if(!count($taskCategoriesDB->getTaskCategoryWhere(["fk_project_id", "name"], [$_POST['fk_project_id'], $taskCategoryName]))){
+                                    $taskCategoriesDB->addTaskCategory([
+                                        "name" => $taskCategoryName,
+                                        "fk_project_id" => $_POST['fk_project_id'],
+                                        "priority" => $taskCategoryPriority,
+                                        "active" => $taskCategoryActive
+                                    ]);
+                                    $insertTaskCategoryID = $taskCategoriesDB->last_inserted_id();
+                                }else{
+                                    $insertTaskCategoryID = $taskCategoriesDB->getTaskCategoryWhere(["fk_project_id", "name"], [$_POST['fk_project_id'], $taskCategoryName])[0]->id;
+                                }
+
+                                $_POST['fk_category_id'] = $insertTaskCategoryID;
+
+                        }
+
+                        if (count($taskDB->update($taskID, $_POST))) {
                             new Toast("The task could not be saved.");
                             exit();
                         }
@@ -104,17 +130,15 @@ class Tasks extends Controller{
 
                         $teamMembers = isset($_POST['teamMembers']) ? $_POST['teamMembers'] : array();
                         foreach ($teamMembers as $key => $value) {
-                            if (count($taskUserMap->insert([
+                           $taskUserMap->insert([
                                 "fk_user_id" => $value,
                                 "fk_task_id" => $taskID
-                            ]))) {
-                                new Toast("The task could not be created.");
-                                $taskUserMap->delete($taskID, 'fk_task_id');
-                                $taskDB->delete($taskID);
-                            }
+                           ]);
                         }
-
                         new Toast("Task saved");
+                        echo json_encode([
+                            "toast" => Toast::show("show toast-onload")
+                        ]);
                     } catch (Exception $e) {
 
                         // Send a custom error response
@@ -127,7 +151,11 @@ class Tasks extends Controller{
                 }
 
                 if (isset($_POST['get-projects-fromCompany'])) {
-                    print_r(json_encode($projectDB->where('fk_company_id', $_POST['companyID'])));
+                    if(isset($_POST['companyID']))
+                        print_r(json_encode($projectDB->where('fk_company_id', $_POST['companyID'])));
+                    else
+                        print_r(json_encode($projectDB->where('fk_company_id', Auth::getFk_company_id())));
+
                     exit();
                 }
 
@@ -150,9 +178,38 @@ class Tasks extends Controller{
                     exit();
                 }
 
+                if (isset($_POST['get-membersAndProject-associated-with-Task'])) {
+
+                    $taskID = $_POST['taskID'];
+
+                    $taskMembersIDs = $taskUserMap->where('fk_task_id', $taskID);
+                    $taskMembersIDs = array_map(function ($obj) {
+                        return $obj->fk_user_id;
+                    }, $taskMembersIDs);
+                    $taskMembersIDs = array_unique($taskMembersIDs);
+                    $returnUsersAndProject = array();
+                    $users = array();
+                    foreach ($taskMembersIDs as $key => $value) {
+                        $userData = $userDB->where('id', $value)[0];
+                        array_push($users, [
+                            "userId" => $userData->id, "userName" => $userData->name, "userRole" => $userData->role
+                            ]
+                        );
+                    }
+
+                    $project = array();
+                    array_push($project, $taskDB->where('id', $taskID)[0]->fk_project_id);
+                    array_push($returnUsersAndProject, $users);
+                    array_push($returnUsersAndProject, $project);
+
+                    print_r(json_encode($returnUsersAndProject));
+                    exit();
+                }
+
                 if (isset($_POST['update-status'])) {
-                    if (isset($_POST['taskStatus'])) {
-                        if (count($taskDB->update($_POST['taskID'], ['status' => $_POST['taskStatus']]))) {
+                    if (isset($_POST['fk_category_id'])) {
+
+                        if (count($taskDB->update($_POST['taskID'], ['fk_category_id' => $_POST['fk_category_id']]))) {
                             new Toast("The task status could not be saved.", "Try again later!");
                             exit();
                         }
@@ -165,64 +222,88 @@ class Tasks extends Controller{
                     $taskUserMap->delete($_POST["taskID"], "fk_task_id");
                     exit();
                 }
+
             }
         }
-        
+        if(!isset($_GET['project'])){
+            $this->redirect('projects');
+        }
+        $actuallyProject = $projectDB->where('slug', $_GET['project'])[0];
+        $projectTasksCategories = $taskCategoriesDB->getTaskCategoryWhere('fk_project_id', $actuallyProject->id);
+
         if(Auth::getRole() == 'admin'){
-            $projectDetails = $projectDB->where('fk_company_id', Auth::getFk_company_id());
-            $taskDetails = $taskDB->where('fk_company_id', Auth::getFk_company_id());
+            if(isset($actuallyProject->id)){
+                $projectDetails = $projectDB->where(['fk_company_id','id'], [Auth::getFk_company_id(), $actuallyProject->id]);
+                $taskDetails = $taskDB->where(['fk_company_id','fk_project_id'], [Auth::getFk_company_id(), $actuallyProject->id]);
+            }
+            
+            // GET ALL TASKS from company ------>>> DISABLED NOW
+            // else{
+            //     $projectDetails = $projectDB->where('fk_company_id', Auth::getFk_company_id());
+            //     $taskDetails = $taskDB->where('fk_company_id', Auth::getFk_company_id());
+            // }
         }
         if(Auth::getRole() == 'employee'){
-            $projectDetails = $projectDB->where('fk_company_id', Auth::getFk_company_id());
-            // GET JUST THE CLIENT TASKS
-            $clientTasksIds = $taskUserMap->where('fk_user_id', Auth::getId());
-            $clientTasksIds = array_map(function($obj){
-                return $obj->fk_task_id;
-            }, $clientTasksIds);
-            $taskDetails = array();
-            foreach ($clientTasksIds as $key => $value) {
-                array_push($taskDetails, $taskDB->where('id', $value)[0]);
+            if(isset($actuallyProject->id)){
+                $projectDetails = $projectDB->where(['fk_company_id','id'], [Auth::getFk_company_id(), $actuallyProject->id]);
+                $taskDetails = $taskDB->query("SELECT DISTINCT t.* FROM tasks as t WHERE t.createdBy_id = :user_id1 
+                OR t.id IN(
+                    SELECT fk_task_id FROM map_users_tasks WHERE fk_user_id = :user_id2
+                )
+                OR t.id NOT IN (
+                    SELECT fk_task_id FROM map_users_tasks
+                )
+                AND t.fk_project_id IN (
+                    SELECT DISTINCT id FROM projects WHERE fk_company_id = :company_id AND fk_project_id = :project_id
+                    )",["user_id1" => Auth::getId(), "user_id2" => Auth::getId(), "company_id" => Auth::getFk_company_id(), ":project_id" => $actuallyProject->id]);
             }
+            // GET ALL TASKS from company ------>>> DISABLED NOW
+            // else{
+            //     $projectDetails = $projectDB->where('fk_company_id', Auth::getFk_company_id());
+            //     $taskDetails = $taskDB->query("SELECT DISTINCT t.* FROM tasks as t INNER JOIN map_users_tasks as mut ON t.id = mut.fk_task_id WHERE createdBy_id = :user_id1 OR mut.fk_user_id = :user_id2 AND t.fk_project_id IN (
+            //         SELECT DISTINCT id FROM projects WHERE fk_company_id = :company_id
+            //         )",["user_id1" => Auth::getId(), "user_id2" => Auth::getId(), "company_id" => Auth::getFk_company_id()]);
+            // }
+            
         }
         if(Auth::getRole() == 'client'){
-            // $userDetails = $userDB->where('fk_company_id', Auth::getFk_company_id());
 
-            // // GET JUST THE CLIENT PROJECTS
-            $clientProjectsIds = $projectUserMap->where('fk_user_id', Auth::getId());
-            $clientProjectsIds = array_map(function($obj){
-                return $obj->fk_project_id;
-            }, $clientProjectsIds);
-            $projectDetails = array();
-            foreach ($clientProjectsIds as $key => $value) {
-                array_push($projectDetails, $projectDB->where('id', $value)[0]);
+            if(isset($actuallyProject->id)){
+                $projectDetails = $projectDB->query("SELECT DISTINCT p.* FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :user_id AND p.id = :project_id;",
+                ["user_id" => Auth::getId(),":project_id" => $actuallyProject->id]);
+    
+                // Megnezem a projekteket, amik a bejelentkezett Users-hez tartozik, majd le kerem a taskeket hozza
+                $taskDetails = $taskDB->query("SELECT DISTINCT t.* FROM tasks as t WHERE t.createdBy_id = :user_id1 
+                OR t.id IN(
+                    SELECT fk_task_id FROM map_users_tasks WHERE fk_user_id = :user_id2
+                )
+                AND t.fk_project_id IN (
+                SELECT DISTINCT p.id FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :user_id3 AND p.id = :project_id
+                )",["user_id1" => Auth::getId(), "user_id2" => Auth::getId(), "user_id3" => Auth::getId(), ":project_id" => $actuallyProject->id]);
             }
-
-            $projectDetails = $taskDB->query("SELECT DISTINCT p.* FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :user_id",
-            ["user_id" => Auth::getId()]);
-
-            // // GET JUST THE CLIENT TASKS
-            // $clientTasksIds = $taskUserMap->where('fk_user_id', Auth::getId());
-            // $clientTasksIds = array_map(function($obj){
-            //     return $obj->fk_task_id;
-            // }, $clientTasksIds);
-            // $taskDetails = array();
-            // foreach ($clientTasksIds as $key => $value) {
-            //     array_push($taskDetails, $taskDB->where('id', $value)[0]);
+            
+            // GET ALL TASKS from company ------>>> DISABLED NOW
+            // else{            
+            //     $projectDetails = $projectDB->query("SELECT DISTINCT p.* FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :user_id",
+            //     ["user_id" => Auth::getId()]);
+    
+            //     // Megnezem a projekteket, amik a bejelentkezett Users-hez tartozik, majd le kerem a taskeket hozza
+            //     $taskDetails = $taskDB->query("SELECT DISTINCT t.* FROM tasks as t INNER JOIN map_users_tasks as mut ON t.id = mut.fk_task_id WHERE createdBy_id = :user_id1 OR mut.fk_user_id = :user_id2 AND t.fk_project_id IN (
+            //     SELECT DISTINCT p.id FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :user_id3
+            //     )",["user_id1" => Auth::getId(), "user_id2" => Auth::getId(), "user_id3" => Auth::getId()]);
             // }
-
-            // Megnezem a projekteket, amik a bejelentkezett Users-hez tartozik, majd le kerem a taskeket hozza
-            $taskDetails = $taskDB->query("SELECT DISTINCT t.* FROM tasks as t INNER JOIN map_users_tasks as mut ON t.id = mut.fk_task_id WHERE mut.fk_user_id = :user_id1 AND t.fk_project_id IN (
-            SELECT DISTINCT p.id FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :user_id2
-            )",["user_id1" => Auth::getId(), "user_id2" => Auth::getId()]);
         }
 
 
         $this->view("tasks", [
             'taskDetails' => $taskDetails,
+            'projectTasksCategories' => $projectTasksCategories,
             'userDetails'=> $userDetails,
             'projectDetails' => $projectDetails,
+            'actuallyProject' => $actuallyProject,
             'companyDetails' => $companyDetails,
-            'errors' => $errors
+            'errors' => $errors,
+            'authId' => Auth::getId()
         ]);
     }
 }

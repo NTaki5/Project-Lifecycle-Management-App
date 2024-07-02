@@ -141,11 +141,11 @@
     </div>
 </div>
 
-    <script>
-        function handleColorTheme(e) {
-            document.documentElement.setAttribute("data-color-theme", e);
-        }
-    </script>
+<script>
+    function handleColorTheme(e) {
+        document.documentElement.setAttribute("data-color-theme", e);
+    }
+</script>
 </div>
 <div class="modal fade" id="exampleModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-scrollable modal-lg modal-dialog-centered">
@@ -171,25 +171,100 @@
     </div>
 </div>
 
+<div class="modal fade" id="tasksModal" tabindex="-1" role="dialog" aria-labelledby="tasksModalForm" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header d-flex align-items-center">
+                <h5 class="modal-title">Choose Project</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="add-project-status-box">
+                    <div class="add-project-status-content">
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="mb-3 project-status-name">
+                                    <select class="form-select select2 form-control mr-sm-2" id="taskSelect" onchange="redirectToTaskPage()">
+                                    <option value=""></option>
+                                        <?php
+
+                                        $projectsDB = new Project();
+                                        if (Auth::getRole() === 'employee' || Auth::getRole() === 'client') {
+                                            $projectsUserMapDB = new Project();
+                                            $projectsUserMapDB->table = "map_users_projects";
+                                            $projectsUserData = $projectsUserMapDB->where('fk_user_id', Auth::getId());
+                                            $projects = $projectsDB->query("SELECT * FROM projects as p INNER JOIN map_users_projects as mup
+                                                ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :userID", ["userID" => Auth::getId()]);
+                                        }
+
+                                        if (Auth::getRole() === 'admin') {
+                                            $projects = $projectsDB->where('fk_company_id', Auth::getFk_company_id());
+                                        }
+
+                                        foreach ($projects as $key => $value) {
+                                            echo '<option value="tasks?project=' . $value->slug . '">' . $value->title . '</option>';
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
 </div>
 <div class="dark-transparent sidebartoggler"></div>
+<!-- Import Js Files -->
+<script src="assets/js/vendor.min.js"></script>
+<script src="assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+<script src="assets/libs/simplebar/dist/simplebar.min.js"></script>
+<script src="assets/js/app/app.init.js"></script>
+<script src="assets/js/app/theme.js"></script>
+<script src="assets/js/app/app.min.js"></script>
+<script src="assets/js/app/sidebarmenu.js"></script>
 
-  <!-- Import Js Files -->
-  <script src="assets/js/vendor.min.js"></script>
-  <script src="assets/libs/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/libs/simplebar/dist/simplebar.min.js"></script>
-  <script src="assets/js/app/app.init.js"></script>
-  <script src="assets/js/app/theme.js"></script>
-  <script src="assets/js/app/app.min.js"></script>
-  <script src="assets/js/app/sidebarmenu.js"></script>
+<!-- solar icons -->
+<script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
+<script src="assets/libs/apexcharts/dist/apexcharts.min.js"></script>
+<!-- <script src="assets/js/dashboards/dashboard1.js"></script> -->
+<script src="assets/libs/fullcalendar/index.global.min.js"></script>
+<script src="assets/libs/select2/dist/js/select2.full.min.js"></script>
+<script src="assets/libs/select2/dist/js/select2.min.js"></script>
+<script src="assets/js/forms/select2.init.js"></script>
+<script>
+    $("#taskSelect").select2({
+        placeholder: "Select Team member",
+        allowClear: true,
+        closeOnSelect: false
+    });
+</script>
+<script defer>
+    $("#open-tasksModal").on("click", function(event) {
+        $("#tasksModal").modal("show");
+    });
 
-  <!-- solar icons -->
-  <script src="https://cdn.jsdelivr.net/npm/iconify-icon@1.0.8/dist/iconify-icon.min.js"></script>
-  <script src="assets/libs/apexcharts/dist/apexcharts.min.js"></script>
-  <!-- <script src="assets/js/dashboards/dashboard1.js"></script> -->
-  <script src="assets/libs/fullcalendar/index.global.min.js"></script>
-    <script src="assets/js/apps/kanban.js"></script>
+    function redirectToTaskPage(){
+        const selectElement = document.getElementById("taskSelect");
+        const selectedValue = selectElement.value;
+        if (selectedValue) {
+            window.location.href = selectedValue;
+        }
+    }
+</script><script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+<script>
+    toastr.success('Table has been updated!', 'Notification');
 
+    
+</script>
 </body>
 
 </html>
+
+

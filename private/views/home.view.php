@@ -71,8 +71,7 @@ $this->view("/includes/header");
                                             <iconify-icon icon="solar:pills-3-linear" class="fs-7 text-secondary"></iconify-icon>
                                         </div>
                                         <div>
-                                            <h6 class="mb-0">355</h6>
-                                            <span>Active hours</span>
+                                            <h6 class="mb-0">1 white boards</h6>
                                         </div>
 
                                     </div>
@@ -110,38 +109,42 @@ $this->view("/includes/header");
                             <div class="card-body">
                                 <h5 class="card-title">Daily activities</h5>
                                 <ul class="timeline-widget mb-0 position-relative mb-n5" data-simplebar style="height: 425px;">
-                                    <li class="timeline-item d-flex position-relative overflow-hidden">
-                                        <div class="timeline-time mt-n1 text-muted flex-shrink-0 text-end">09:46
+                                    <li class="timeline-item mb-3 d-flex position-relative overflow-hidden">
+                                        <div class="timeline-time mt-n1 text-muted flex-shrink-0 text-end">08:46
                                         </div>
                                         <div class="timeline-badge-wrap d-flex flex-column align-items-center">
                                             <span class="timeline-badge bg-primary flex-shrink-0 mt-2"></span>
                                             <span class="timeline-badge-border d-block flex-shrink-0"></span>
                                         </div>
-                                        <div class="timeline-desc fs-3 text-dark mt-n1">Payment received from John
-                                            Doe of $385.90</div>
+                                        <div class="timeline-desc fs-3 text-dark mt-n1">
+                                            Taki Employee created a new task - "Create a CTA button in Menu"
+                                            <a href="tasks" class="text-primary d-block fw-normal ">Tasks</a>
+                                        </div>
                                     </li>
-                                    <li class="timeline-item d-flex position-relative overflow-hidden">
-                                        <div class="timeline-time mt-n6 text-muted flex-shrink-0 text-end">09:46
+                                    <li class="timeline-item mb-3 d-flex position-relative overflow-hidden">
+                                        <div class="timeline-time mt-n6 text-muted flex-shrink-0 text-end">09:56
                                         </div>
                                         <div class="timeline-badge-wrap d-flex flex-column align-items-center">
                                             <span class="timeline-badge bg-warning flex-shrink-0"></span>
                                             <span class="timeline-badge-border d-block flex-shrink-0"></span>
                                         </div>
-                                        <div class="timeline-desc fs-3 text-dark mt-n6 fw-semibold">New sale
-                                            recorded <a href="javascript:void(0)" class="text-primary d-block fw-normal ">#ML-3467</a>
+                                        <div class="timeline-desc fs-3 text-dark mt-n6">
+                                        Taki Employee created a new task - "Create a CTA button in hero slider"
+                                        <a href="tasks" class="text-primary d-block fw-normal ">Tasks</a>
                                         </div>
                                     </li>
-                                    <li class="timeline-item d-flex position-relative overflow-hidden">
-                                        <div class="timeline-time mt-n6 text-muted flex-shrink-0 text-end">09:46
+                                    <li class="timeline-item mb-3 d-flex position-relative overflow-hidden">
+                                        <div class="timeline-time mt-n6 text-muted flex-shrink-0 text-end">11:46
                                         </div>
                                         <div class="timeline-badge-wrap d-flex flex-column align-items-center">
                                             <span class="timeline-badge bg-warning flex-shrink-0"></span>
                                             <span class="timeline-badge-border d-block flex-shrink-0"></span>
                                         </div>
-                                        <div class="timeline-desc fs-3 text-dark mt-n6">Payment was made of $64.95
-                                            to Michael</div>
+                                        <div class="timeline-desc fs-3 text-dark mt-n6">
+                                            Taki Employee created a new task - "Delete the XY project" 
+                                        </div>
                                     </li>
-                                    <li class="timeline-item d-flex position-relative overflow-hidden">
+                                    <!-- <li class="timeline-item mb-3 d-flex position-relative overflow-hidden">
                                         <div class="timeline-time mt-n6 text-muted flex-shrink-0 text-end">09:46
                                         </div>
                                         <div class="timeline-badge-wrap d-flex flex-column align-items-center">
@@ -152,7 +155,7 @@ $this->view("/includes/header");
                                             recorded <a href="javascript:void(0)" class="text-primary d-block fw-normal ">#ML-3467</a>
                                         </div>
                                     </li>
-                                    <li class="timeline-item d-flex position-relative overflow-hidden">
+                                    <li class="timeline-item mb-3 d-flex position-relative overflow-hidden">
                                         <div class="timeline-time mt-n6 text-muted flex-shrink-0 text-end">09:46
                                         </div>
                                         <div class="timeline-badge-wrap d-flex flex-column align-items-center">
@@ -162,7 +165,7 @@ $this->view("/includes/header");
                                         <div class="timeline-desc fs-3 text-dark mt-n6 fw-semibold">Project meeting
                                         </div>
                                     </li>
-                                    <li class="timeline-item d-flex position-relative overflow-hidden">
+                                    <li class="timeline-item mb-3 d-flex position-relative overflow-hidden">
                                         <div class="timeline-time mt-n6 text-muted flex-shrink-0 text-end">09:46
                                         </div>
                                         <div class="timeline-badge-wrap d-flex flex-column align-items-center">
@@ -170,7 +173,7 @@ $this->view("/includes/header");
                                         </div>
                                         <div class="timeline-desc fs-3 text-dark mt-n6">Payment received from John
                                             Doe of $385.90</div>
-                                    </li>
+                                    </li> -->
                                 </ul>
                             </div>
                         </div>

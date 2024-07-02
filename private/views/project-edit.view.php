@@ -32,7 +32,7 @@ $this->view("/includes/header");
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="start_date" name="start_date" value="<?= strlen(get_var("start_date"))? get_var("start_date") : $projectDetails->start_date ?>" />
+                                    <input type="datetime-local" class="form-control" id="start_date" name="start_date" value="<?= strlen(get_var("start_date"))? get_var("start_date") : $projectDetails->start_date ?>" />
                                     <label for="start_date">Start Date *</label>
                                     <div class="invalid-feedback">
                                         <?php echo isset($errors["start_date"]) ? $errors["start_date"] : "" ?>
@@ -41,7 +41,7 @@ $this->view("/includes/header");
                             </div>
                             <div class="col-sm-6 col-md-4">
                                 <div class="form-floating mb-3">
-                                    <input type="date" class="form-control" id="end_date" name="end_date" value="<?= strlen(get_var("end_date"))? get_var("end_date") : $projectDetails->end_date ?>" />
+                                    <input type="datetime-local" class="form-control" id="end_date" name="end_date" value="<?= strlen(get_var("end_date"))? get_var("end_date") : $projectDetails->end_date ?>" />
                                     <label for="end_date">End Date *</label>
                                     <div class="invalid-feedback">
                                         <?php echo isset($errors["end_date"]) ? $errors["end_date"] : "" ?>
@@ -52,9 +52,9 @@ $this->view("/includes/header");
                                 <div class="form-floating mb-4">
                                     <select class="form-select form-control mr-sm-2" id="priority" name="priority">
                                         <option selected="">Choose...</option>
-                                        <option value="low" selected>Low</option>
-                                        <option value="medium">Medium</option>
-                                        <option value="high">High</option>
+                                        <option value="low" <?= $projectDetails->priority === 'low' ? 'selected' : ""?>>Low</option>
+                                        <option value="medium" <?= $projectDetails->priority === 'medium' ? 'selected' : ""?>>Medium</option>
+                                        <option value="high" <?= $projectDetails->priority === 'high' ? 'selected' : ""?>>High</option>
                                     </select>
                                     <label class="mr-sm-2" for="priority">Priority</label>
                                     <div class="invalid-feedback">
@@ -100,6 +100,11 @@ $this->view("/includes/header");
                                     <textarea class="form-control h-auto" name="description" id="description" rows="5"><?= strlen(get_var("description"))? get_var("description") : $projectDetails->description ?></textarea>
                                 </div>
                             </div>
+                            <?php 
+                                if(isset($_GET['backto-all-projects'])){
+                                    echo '<input type="hidden" name="backto-all-projects"/>';
+                                }
+                            ?>
                             <div class="col-12">
                                 <div class="d-md-flex align-items-center">
                                     <div class="mt-3 mt-md-0">

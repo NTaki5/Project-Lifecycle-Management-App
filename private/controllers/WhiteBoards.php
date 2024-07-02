@@ -1,6 +1,5 @@
 <?php
-// Login Controller
-require_once('assets/miro/vendor/autoload.php');
+require '../vendor/autoload.php';
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
@@ -14,7 +13,6 @@ class WhiteBoards extends Controller
 
         $errors = array();
         $boardDB = new WhiteBoard();
-
         
         if($_SERVER['REQUEST_METHOD'] === 'POST'){
             if(isset($_POST['delete-board'])){

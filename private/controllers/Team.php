@@ -15,9 +15,9 @@ class Team extends Controller
 
         // AN AJAX CALL from team.js, because the form is controled by Javascript, without page refresh
         if (isset($_POST['send-email'])) {
-            $name = $_POST['name'];
-            $email = $_POST['email'];
-            $phone = $_POST['phone'];
+            $name = isset($_POST['name'])? $_POST['name'] : "";
+            $email = isset($_POST['email'])? $_POST['email'] : "";
+            $phone = isset($_POST['phone'])? $_POST['phone'] : "";
 
             $token = generateToken();
             $sendeEmail = new SendEmail();
@@ -25,10 +25,17 @@ class Team extends Controller
 
             try {
 
-                if(!$invitations->uniqueValue('email', $email)){
-                    new Toast("We have already sent an invitation to this email address.", 999);
-                    echo "Fail invitation sent";
-                    exit();
+                if(!$invitations->uniqueValue(['email','fk_company_id'], [$email, Auth::getFk_company_id()])){
+                    
+                    $invitationDatas = $invitations->where(['email','fk_company_id'], [$email, Auth::getFk_company_id()]);
+                    foreach ($invitationDatas as $key => $value) {
+                        if($value->expires_at > date('Y-m-d H:i:s')){
+                            http_response_code(400); 
+                            new Toast("We have already sent an invitation to this email address.");
+                            echo json_encode(['value' => Toast::show("show toast-onload"), 'code' => 999]);
+                            exit();
+                        }
+                    }
                 }
 
                 $emailSubject = "CMS Invitation";
@@ -40,7 +47,8 @@ class Team extends Controller
                $sendeEmail->mySend($email, $name, $emailSubject, $emailBody, $altBody);
                 
                 // Here the e-mail has been sent
-                
+                // print_r("HERE");
+                // exit();
                 $invitations->insert([
                     "fk_company_id" => Auth::getFk_company_id(),
                     "fk_project_id" => -1,
@@ -58,12 +66,6 @@ class Team extends Controller
                 // get a HTML string from Toast::show("show toast-onload") only if the toast is seted $_SESSION['show-toast']
                 echo json_encode(['value' => Toast::show("show toast-onload")]);
             } catch (Exception $e) {
-                // if you want to display email error message:  "Mailer Error: {$mail->ErrorInfo}"
-                if((int)$e->getCode() == (int)999){
-                    Toast::setToast($e->getMessage());
-                }else{
-                    Toast::setToast("The invitation could not be sent.", "Try later.");
-                }
 
                 // Send a custom error response
                 header('Content-Type: application/json');

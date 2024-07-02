@@ -9,6 +9,11 @@ class Invitation extends Model{
 
         $tableRows = "";
         $invitations = $this->where('used',0);
+        // $invitations = array_map(function($obj){
+        //     if($obj->expires_at > date('Y-m-d H:i:s'))
+        //         return $obj;
+        // }, $invitations);
+        // $invitations = array_filter( $invitations);
         rsort($invitations);
 
         $actionBtns = "";
@@ -24,7 +29,17 @@ DELIMETER;
 
         foreach ($invitations as $key => $value) {
             $avatar = 'user-'.rand(1,15).'.jpg';
-            // print_r($invitations[$key]); die();
+            if($value->expires_at > date('Y-m-d H:i:s')){
+                $confirmationText = 'Waiting for confirmation';
+                $statusText = 'pending';
+                $statusClass = '';
+            }
+            else{
+                $confirmationText = 'Invitation expired';
+                $statusText = 'expired';
+                $statusClass = 'bg-danger text-white';
+            }
+
             $tableRows .= <<<DELIMETER
                 <tr class="search-items">
                     <td>
@@ -41,14 +56,14 @@ DELIMETER;
                             <div class="ms-3">
                                 <div class="user-meta-info d-flex flex-column">
                                     <h6 class="user-name mb-0" data-name="{$invitations[$key]->name}">{$invitations[$key]->name}</h6>
-                                    <span class="text-danger">Waiting for confirmation</span>
+                                    <span class="text-danger">$confirmationText</span>
                                 </div>
                             </div>
                         </div>
                     </td>
                     <td>
-                      <span class="badge text-bg-light text-dark fw-semibold fs-2 gap-1 d-inline-flex align-items-center">
-                        <i class="ti ti-clock-hour-4 fs-3"></i>offline
+                      <span class="$statusClass badge text-bg-light text-dark fw-semibold fs-2 gap-1 d-inline-flex align-items-center">
+                        <i class="ti ti-clock-hour-4 fs-3"></i>$statusText
                       </span>
                     </td>
                     <td>

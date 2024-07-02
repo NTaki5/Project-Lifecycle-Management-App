@@ -17,11 +17,11 @@ class Toast
         $_SESSION['show-toast'] = true;
     }
 
-    public static function getToast($title, $subtitle)
-    {
-        $_SESSION['toastTitle'] = $title;
-        $_SESSION['toastSubtitle'] = $subtitle;
-    }
+    // public static function getToast($title, $subtitle)
+    // {
+    //     $_SESSION['toastTitle'] = $title;
+    //     $_SESSION['toastSubtitle'] = $subtitle;
+    // }
 
     public static function show($class="")
     {

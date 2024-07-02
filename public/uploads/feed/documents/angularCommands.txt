@@ -1,0 +1,2 @@
+ng serve
+npm run build --configuration=environment.prod

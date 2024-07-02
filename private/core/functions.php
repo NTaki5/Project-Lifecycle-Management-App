@@ -307,3 +307,68 @@ function findInObjectsArrayById($objectsArray, $findThat, $toBeEqualWith) {
     }
     return $returnArray ; // Return null if value not found
 }
+
+function getDateInterval($date1, $date2 = new DateTime('now')){
+
+    $currentSecond = $date2->format('s');
+    $currentMinute = $date2->format('i');
+    $currentHour = $date2->format('H');
+    $currentDay = $date2->format('d');
+    $currentMonth = $date2->format('m');
+    $currentYear = $date2->format('Y');
+
+
+    $interval = $date2->diff($date1);
+
+    $displayTime = "";
+    if ($interval->y > 0) {
+        $displayTime .= $interval->y . " y ";
+    }
+    if ($interval->m > 0) {
+        $displayTime .= $interval->m . " M ";
+    }
+    if ($interval->d > 0) {
+        $displayTime .= $interval->d . " d ";
+    }
+    else{
+        if ($interval->h > 0) {
+            $displayTime .= $interval->h . " h ";
+        }
+        if ($interval->i > 0) {
+            $displayTime .= $interval->i . " m ";
+        }
+    }
+    if(!strlen($displayTime))
+        $displayTime = "a few seconds ago";
+
+        return $displayTime;
+}
+
+function hex2rgba($color, $opacity = false)
+{
+    $default = 'rgb(0,0,0)';
+    if (empty($color))
+        return $default;
+    if ($color[0] == '#') {
+        $color = substr($color, 1);
+    }
+
+    if (strlen($color) == 6) {
+        $hex = array($color[0] . $color[1], $color[2] . $color[3], $color[4] . $color[5]);
+    } elseif (strlen($color) == 3) {
+        $hex = array($color[0] . $color[0], $color[1] . $color[1], $color[2] . $color[2]);
+    } else {
+        return $default;
+    }
+
+    $rgb = array_map('hexdec', $hex);
+    if ($opacity) {
+        if (abs($opacity) > 1)
+            $opacity = 1.0;
+        $output = 'rgba(' . implode(",", $rgb) . ',' . $opacity . ')';
+    } else {
+        $output = 'rgb(' . implode(",", $rgb) . ')';
+    }
+
+    return $output;
+}

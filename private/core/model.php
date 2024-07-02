@@ -45,10 +45,12 @@ class Model extends Database
         }
     }
 
-    public function findAll($where="" , $orderby="ASC", $limit=""){
+    public function findAll($where="" , $orderby='id ASC', $limit="", $groupby = ""){
         $where = strlen($where) ? "WHERE " . $where : "";
+        $orderby = strlen($orderby) ? "ORDER BY " . $orderby : "";
         $limit = strlen($limit) ? "LIMIT " . $limit : "";
-        $query = "SELECT * FROM $this->table $where ORDER BY '$orderby' $limit;";
+        $groupby = strlen($groupby) ? "GROUP BY " . $groupby : "";
+        $query = "SELECT * FROM $this->table $where $groupby $orderby $limit;";
         return $this->query($query);
     }
 
@@ -122,10 +124,10 @@ class Model extends Database
         return true;
     }
 
-    public function myCheckDate($date){
-        // $date == "06/06/2023";
-        list($day, $month, $year) = explode('-', $date);
-        return checkdate($month, $day, $year) ? true : false;
+    public function myCheckDate($dateString){
+        $format = 'Y-m-d\TH:i';
+        $dateTime = DateTime::createFromFormat($format, $dateString);
+        return $dateTime && $dateTime->format($format) === $dateString;
     }
 
     // Slugify a string

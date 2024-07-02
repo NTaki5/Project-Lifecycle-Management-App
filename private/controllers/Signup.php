@@ -7,7 +7,7 @@ class Signup extends Controller{
 
         $errors = array();
         // WHEN I HAVE TO SAVE DATA IN DB
-        if(count($_POST)){
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
             $user = new User();
             $invitation = new Invitation();
             
@@ -133,10 +133,12 @@ class Signup extends Controller{
             $invitation = new Invitation();
             $token = $_GET['token'];
             if(!($invitationDatas = $invitation->where('token', $token)[0])){
+                Toast::setToast("Invalid token");
                 $this->redirect('login');
             }
 
             if($invitationDatas->used){
+                Toast::setToast("The token has already been used");
                 $this->redirect('login');
             }
             

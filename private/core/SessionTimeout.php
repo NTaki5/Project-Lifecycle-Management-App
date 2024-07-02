@@ -3,9 +3,14 @@
 class SessionTimeout extends Controller{
 
     function __construct(){
-        
+        // Check if session is started and active, if not, then set the params 
+        session_set_cookie_params([
+            'lifetime' => 1440,
+            'secure' => false, // Change to true if you are using HTTPS
+            'httponly' => true, // This helps mitigate XSS attacks
+        ]);
 
-
+        session_start();
         $session_timeout = 1440;//24 minutes
 
         if (isset($_SESSION['LAST_ACTIVITY'])) {

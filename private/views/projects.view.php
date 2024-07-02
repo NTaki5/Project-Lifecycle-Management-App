@@ -9,7 +9,15 @@ $this->view("/includes/header");
     <div class="card">
         <div class="card-body">
 
-            <h4 class="card-title mb-4">Projects</h4>
+            <div class="d-flex justify-content-between mb-4">
+                <h4 class="card-title">Projects</h4>
+                <?php if(Auth::getRole() !== 'client'):?>
+                    <a href="projects/statuses" class="w-auto justify-content-center w-100 btn btn-secondary d-flex align-items-center" fdprocessedid="hvxcfy">
+                        <i class="ti ti-folder fs-7 me-2"></i>
+                        Statuses
+                    </a>
+                <?php endif;?>
+            </div>
             <div>
 
                 <!-- Nav tabs -->
@@ -29,9 +37,7 @@ $this->view("/includes/header");
                         </a>
                     </li>
                     <?php 
-                        foreach ($status as $key => $value) {
-
-                            $thisStatusProjects = $projectClass->getProjectsCards($projects,$value->id);
+                        foreach ($allStatus as $key => $value) {
                             $statusName = ucfirst($value->name);
                             echo <<<DELIMETER
                             <li class="nav-item">
@@ -52,15 +58,15 @@ DELIMETER;
                     <div class="tab-pane p-3 active" id="All" role="tabpanel">
                         <div class="row">
                         <?php 
-                        echo $projectClass->getProjectsCards($projects);
+                        print_r($projectClass->getProjectsCards($projects,$allStatus));
                         
                         ?>
                         </div>
                     </div>
                     <?php 
-                        foreach ($status as $key => $value) {
+                        foreach ($allStatus as $key => $value) {
 
-                            $thisStatusProjects = $projectClass->getProjectsCards($projects,$value->id);
+                            $thisStatusProjects = $projectClass->getProjectsCards($projects,$allStatus,$value->id);
 
                             echo <<<DELIMETER
                             <div class="tab-pane p-3" id="{$value->name}" role="tabpanel">

@@ -6,10 +6,17 @@ define('CONTROLLERS_PATH', '../private/controllers/');
 define('VIEWS_PATH', '../private/views/');
 define('MODELS_PATH', '../private/models/');
 
+// localhost
 define('DB_HOST', 'localhost');
 define('DB_USER', 'root');
 define('DB_PASS', '');
 define('DB_NAME', 'projectlifecyclemanagmentapp');
+
+// live profreehost
+// define('DB_HOST', 'localhost');
+// define('DB_USER', 'root');
+// define('DB_PASS', '');
+// define('DB_NAME', 'ezyro_36825422_prolifemanagement');
 
 define('SMTP_HOST', 'sandbox.smtp.mailtrap.io');
 define('SMTP_USERNAME', '40f8378f6aa25a');

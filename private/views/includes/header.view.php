@@ -17,7 +17,7 @@
   <link rel="stylesheet" href="<?= ROOT ?>/assets/libs/select2/dist/css/select2.min.css">
 
   <?php
-  session_start();
+  // session_start();
   $url = explode("/", "$_SERVER[REQUEST_URI]");
   if (count($url) == 5) {
     echo '<base href="../">';
@@ -167,7 +167,7 @@
                 </li>
 
                 <li class="sidebar-item">
-                  <a class="sidebar-link" href="tasks">
+                  <a class="sidebar-link" id="open-tasksModal" href="javascript:void(0);">
                     <iconify-icon icon="grommet-icons:task"></iconify-icon class="text-secondary">
                     <span class="hide-menu">Tasks</span>
                   </a>

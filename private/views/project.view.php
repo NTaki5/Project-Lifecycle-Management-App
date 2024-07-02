@@ -20,24 +20,18 @@ $this->view("/includes/header");
                                         $statusName = ucfirst($value->name);
                                         echo <<<DELIMETER
                                             <li>
-                                                <a class="dropdown-item" href="projects/single/next-problem?update-status&status-id={$value->id}">$statusName</a>
+                                                <a class="dropdown-item" href="projects/single/$slug?update-status&status-id={$value->id}">$statusName</a>
                                             </li>
 DELIMETER;
                                     }
                                 ?>
-                                <!-- <li>
-                                    <a class="dropdown-item" href="update-status/">Action</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="update-status/">Another action</a>
-                                </li>
-                                <li>
-                                    <a class="dropdown-item" href="update-status/">Something else here</a>
-                                </li> -->
                             </ul>
                         </div>
-                        <a href="tasks/" class="btn btn-secondary d-flex align-items-center ms-4">
+                        <a href="tasks?project=<?=$slug?>" class="btn btn-secondary d-flex align-items-center ms-4">
                             Tasks
+                        </a>
+                        <a href="documents?project=<?=$slug?>" class="btn btn-secondary d-flex align-items-center ms-4">
+                            Documents
                         </a>
                     </div>
                 </div>
@@ -68,7 +62,9 @@ DELIMETER;
                             if(isset($value->role) && $value->role !== 'client'){
                                 $image = strlen($value->image) ? 'uploads/users/'.$value->image : 'assets/images/profile/'.$value->avatar;
                                 echo <<<DELIMETER
-                                <img src="$image" alt="$value->name" class="hover-scale img-fluid rounded-circle bottom-0 start-0" width="40" height="40" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="$value->name">
+                                <a href="accountSettings/watch?user=$value->username">
+                                    <img src="$image" alt="$value->name" class="hover-scale img-fluid rounded-circle bottom-0 start-0" width="40" height="40" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="$value->name">
+                                </a>
 DELIMETER;
                             }
                         }
@@ -85,7 +81,10 @@ DELIMETER;
                             if(isset($value->role) && $value->role === 'client'){
                                 $image = strlen($value->image) ? 'uploads/users/'.$value->image : 'assets/images/profile/'.$value->avatar;
                                 echo <<<DELIMETER
-                                <img src="$image" alt="$value->name" class="hover-scale img-fluid rounded-circle bottom-0 start-0" width="40" height="40" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="$value->name">
+                                
+                                <a href="accountSettings/watch?user=$value->username">
+                                    <img src="$image" alt="$value->name" class="hover-scale img-fluid rounded-circle bottom-0 start-0" width="40" height="40" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="$value->name">
+                                </a>
 DELIMETER;
                             }
                         }
@@ -93,13 +92,13 @@ DELIMETER;
                         ?>
                     </div>
                     <div class="d-flex align-items-center mb-3 mb-md-0 justify-content-start gap-2 col-sm-4 col-md-3">
-                        <i class="ti ti-message-2 text-dark fs-5"></i>3
+                        <h6 class="m-0">Posts: <?=$feedNumbers?></h6> <i class="ti ti-message-2 text-dark fs-5"></i> 
                     </div>
 
                     <div class="d-flex gap-2 align-items-center mb-3 mb-md-0 justify-content-start fs-2 ms-lg-auto col-md-3 flex-wrap">
                         <span>
                             <i class="ti ti-point text-dark"></i>
-                            Team Leader is <a href="user-details/<?= !empty($teamLead) ? $teamLead->id : "" ?>"><?= !empty($teamLead) ? $teamLead->name : " NOBODY" ?></a>
+                            Team Leader is <a href="accountSettings/watch?user=<?= !empty($teamLead) ? $teamLead->username : "" ?>"><?= !empty($teamLead) ? $teamLead->name : " NOBODY" ?></a>
                         </span>
                         <span>The project was created on <?= $projectDetails->date ?></span>
                     </div>
@@ -128,8 +127,8 @@ DELIMETER;
                     <div class="d-flex">
                         <span><i class="ti ti-time text-white me-1 fs-5"></i></span>
                         <div>
-                            <h4 class="fs-18 font-w500">Project Create</h4>
-                            <span><?= getFormattedDate($projectDetails->date) ?></span>
+                            <h4 class="fs-18 font-w500">Start date</h4>
+                            <span><?= getFormattedDate($projectDetails->start_date) ?></span>
                         </div>
                     </div>
                 </div>
@@ -143,7 +142,7 @@ DELIMETER;
                 </div>
                 <div class="col-xl-4 mt-4 col-sm-12">
                     <div class="mb-3">
-                        <span class="fs-18 font-w500"><b><?= $elapsedDays ?></b></span>
+                        <span class="fs-18 font-w500"><b><?= $remainedDays ?></b></span>
                     </div>
                     <div class="progress h-auto">
                         <div class="progress-bar progress-animated" style="width: <?= $progressPercantege ?>%; height:14px;" role="progressbar">
@@ -164,7 +163,7 @@ DELIMETER;
         <div class="card-body">
             <form method="POST" enctype="multipart/form-data">
                 <div class="form-floating mb-3">
-                    <textarea class="form-control h-auto" placeholder="Share your thoughts" name="message" id="message" rows="10"></textarea>
+                    <textarea class="form-control h-auto" placeholder="Share your thoughts" name="message" id="message" rows="6"></textarea>
                     <label for="message">Share your thoughts</label>
                 </div>
                 <div class="d-flex align-items-center gap-6 flex-wrap">
@@ -194,20 +193,17 @@ DELIMETER;
     foreach ($feedDetails as $key => $feedValue) {
         if($feedValue->fk_parent_id > 0)
             continue;
-        // print_r($teamMembers);
-        // print_r($userName);
+        
+        $commentUserImage = "";
+        // $commentBy = "";
         $startDate = new DateTime($feedValue->date);
         $endDate = new DateTime();
-        $interval = $startDate->diff($endDate);
-        $days = $interval->d;
-        $hours = $interval->h;
-        $minutes = $interval->i;
-        $displayTime = $days != '0' ? $days.' d' : $hours.' h';
-        $displayTime = $displayTime[0] != '0' ? $displayTime : $minutes.' min';
 
         // print_r(findInObjectsArrayById($teamMembers,'id', $feedValue->fk_user_id));
         $feedPostedBy = count(findInObjectsArrayById($teamMembers,'id', $feedValue->fk_user_id)) ? findInObjectsArrayById($teamMembers,'id', $feedValue->fk_user_id)[0] : null;
         $userName = $feedPostedBy->name;
+        $commentUserImage = strlen($feedPostedBy->image) ? 'uploads/users/'.$feedPostedBy->image : 'assets/images/profile/'.$feedPostedBy->avatar;
+
         $likedFeedsButtonClass  = "";
         if(isset($authUserFeedLikesIDS)){
             $likedFeedsButtonClass =  in_array($feedValue->id, $authUserFeedLikesIDS) ? "opacity-50" : "";
@@ -254,35 +250,49 @@ DELIMETER;
         });
 
         // Create the comments section, under the actual FEED (comments , replies)
-        $comments = "";  
+        $commentCardsString = "";  
+        $now = new DateTime('now');
+        $currentSecond = $now->format('s');
+        $currentMinute = $now->format('i');
+        $currentHour = $now->format('H');
+        $currentDay = $now->format('d');
+        $currentMonth = $now->format('m');
+        $currentYear = $now->format('Y');
+
+        $startDateFeed = new DateTime($feedValue->date);
+        $displayTimeFeed = getDateInterval($startDateFeed);
+        
         foreach ($commentDetails as $key => $commentValue) {
 
             $commentBy = findInObjectsArrayById($teamMembers,'id', $commentValue->fk_user_id)[0];
             $userName = $commentBy->name;
             $commentUserImage = strlen($commentBy->image) ? 'uploads/users/'.$commentBy->image : 'assets/images/profile/'.$commentBy->avatar;
 
-            $startDate = new DateTime($commentValue->date);
+            $startDateComment = new DateTime($commentValue->date);
             $endDate = new DateTime();
-            $interval = $startDate->diff($endDate);
-            $days = $interval->d;
-            $hours = $interval->h;
-            $minutes = $interval->i;
-            $displayTime = $days != '0' ? $days.' d' : $hours.' h';
-            $displayTime = $displayTime[0] != '0' ? $displayTime : $minutes.' min';
+
+            $displayTime = getDateInterval($startDateComment);
 
             $childCommentDetails = ($childCommentsCount = count($commentDB->where('fk_parent_id', $commentValue->id)))? $commentDB->where('fk_parent_id', $commentValue->id) : [];
 
+
+            // Check If the authenticated user likes the comment/feed or not
             if(isset($authUserCommentLikesIDS)){
                 $likedCommentsButtonClass =  in_array($commentValue->id, $authUserCommentLikesIDS) ? "opacity-50" : "";
             }
 
-            $comments .= <<<DELIMETER
-            <div class="p-4 rounded-2 text-bg-light mb-3 replyBox">
+            $commentCardsString .= <<<DELIMETER
+            <div class="p-4 rounded-2 text-bg-light mb-3 replyBox position-relative" id="{$commentValue->id}">
+                <a href="javascript:void(0)" class="text-danger delete-reply ms-2 position-absolute end-0 top-0 mt-3 me-3">
+                    <i class="ti ti-trash fs-5"></i>
+                </a>
                 <div class="d-flex align-items-center gap-6 flex-wrap">
-                    <img src="$commentUserImage" alt="matdash-img" class="rounded-circle" width="33" height="33">
-                    <h6 class="mb-0">$userName</h6>
+                    <a class="d-flex flex-wrap gap-2 align-items-center" href="accountSettings/watc?user=$commentBy->username">
+                        <img src="$commentUserImage" alt="matdash-img" class="rounded-circle" width="33" height="33">
+                        <h6 class="mb-0">$userName</h6>
+                    </a>
                     <span class="fs-2">
-                        <span class="p-1 text-bg-muted rounded-circle d-inline-block"></span> $displayTime ago
+                        <span class="p-1 text-bg-muted rounded-circle d-inline-block"></span> $displayTime
                     </span>
                 </div>
                 <p class="my-3">
@@ -301,39 +311,41 @@ DELIMETER;
                         <a id="" data-commentID="$commentValue->id" data-feedID="$feedValue->id" class="round-32 rounded-circle btn btn-secondary p-0 hstack justify-content-center comment-reply" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Reply">
                             <i class="ti ti-arrow-back-up"></i>
                         </a>
-                        <span class="text-dark fw-semibold">$childCommentsCount</span>
+                        <span class="text-dark fw-semibold" id="comment-comments">$childCommentsCount</span>
                     </div>
                 </div>
             </div>
 DELIMETER;
 
             if(isset($commentValue->id)){
+                
                 foreach ($childCommentDetails as $key => $childCommentValue) {
 
                     $commentBy = findInObjectsArrayById($teamMembers,'id', $childCommentValue->fk_user_id)[0];
                     $userName = $commentBy->name;
 
-                    $commentUserImage = strlen($commentBy->image) ? 'uploads/users/'.$commentBy->image : 'assets/images/profile/'.$commentBy->avatar;
+                    $commentUserImageChild = strlen($commentBy->image) ? 'uploads/users/'.$commentBy->image : 'assets/images/profile/'.$commentBy->avatar;
 
-                    $startDate = new DateTime($childCommentValue->date);
-                    $endDate = new DateTime();
-                    $interval = $startDate->diff($endDate);
-                    $days = $interval->d;
-                    $hours = $interval->h;
-                    $minutes = $interval->i;
-                    $childDisplayTime = $days != '0' ? $days.' d' : $hours.' h';
-                    $childDisplayTime = $childDisplayTime[0] != '0' ? $childDisplayTime : $minutes.' min';
+            $startDateChildComment = new DateTime($childCommentValue->date);
+            $endDate = new DateTime();
+
+            $childDisplayTime = getDateInterval($startDateChildComment);
 
                     if(isset($authUserCommentLikesIDS)){
                         $likedChildCommentsButtonClass =  in_array($childCommentValue->id, $authUserCommentLikesIDS) ? "opacity-50" : "";
                     }
-                    $comments .= <<<DELIMETER
-                        <div class="p-4 rounded-2 text-bg-light mb-3 ms-7">
+                    $commentCardsString .= <<<DELIMETER
+                        <div class="p-4 rounded-2 text-bg-light mb-3 ms-7 replyBox position-relative" id="{$childCommentValue->id}">
+                            <a href="javascript:void(0)" class="text-danger delete-reply ms-2 position-absolute end-0 top-0 mt-3 me-3">
+                                <i class="ti ti-trash fs-5"></i>
+                            </a>
                             <div class="d-flex align-items-center gap-6 flex-wrap">
-                                <img src="$commentUserImage" alt="matdash-img" class="rounded-circle" width="33" height="33">
-                                <h6 class="mb-0">$userName</h6>
+                                <a class="d-flex flex-wrap gap-2 align-items-center" href="accountSettings/watc?user=$commentBy->username">
+                                    <img src="$commentUserImageChild" alt="matdash-img" class="rounded-circle" width="33" height="33">
+                                    <h6 class="mb-0">$userName</h6>
+                                </a>
                                 <span class="fs-2">
-                                    <span class="p-1 text-bg-muted rounded-circle d-inline-block"></span> $childDisplayTime ago
+                                    <span class="p-1 text-bg-muted rounded-circle d-inline-block"></span> $childDisplayTime
                                 </span>
                             </div>
                             <p class="my-3">
@@ -355,43 +367,52 @@ DELIMETER;
             }
         }
         
-        
 
-        // The entire feed card (4 feed -> 4 cards)
+        // The entire feed card (4feed -> 4cards, one card contains the comments and documents)
         echo <<<DELIMETER
         <div class="card">
-            <div class="card-body border-bottom">
+            <div class="card-body border-bottom position-relative feedBox" id="{$feedValue->id}">
+                <a href="javascript:void(0)" class="text-danger delete-feed ms-2 position-absolute end-0 top-0 mt-3 me-3">
+                    <i class="ti ti-trash fs-5"></i>
+                </a>
                 <div class="d-flex align-items-center gap-6 flex-wrap">
-                    <img src="$userImage" alt="matdash-img" class="rounded-circle" width="40" height="40">
-                    <h6 class="mb-0">$userName</h6>
+                    <a class="d-flex flex-wrap gap-2 align-items-center" href="accountSettings/watc?user=$feedPostedBy->username">
+                        <img src="$commentUserImage" alt="matdash-img" class="rounded-circle" width="33" height="33">
+                        <h6 class="mb-0">$userName</h6>
+                    </a>
                     <span class="fs-2 hstack gap-2">
-                        <span class="round-10 text-bg-light rounded-circle d-inline-block"></span> $displayTime ago
+                        <span class="round-10 text-bg-light rounded-circle d-inline-block"></span> $displayTimeFeed
                     </span>
                 </div>
                 <p class="text-dark my-3">
                     {$feedValue->message}
                 </p>
+
                 $displayDocuments
                 $displayImages
-                <div class="d-flex align-items-center my-3">
-                    <div class="d-flex align-items-center gap-2">
-                        <a class="$likedFeedsButtonClass round-32 rounded-circle btn btn-primary p-0 hstack justify-content-center feed-like" data-feedID="{$feedValue->id}" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Like">
-                            <i class="ti ti-thumb-up"></i>
+                
+                    <div class="d-flex align-items-center my-3">
+                        <div class="d-flex align-items-center gap-2">
+                            <a class="$likedFeedsButtonClass round-32 rounded-circle btn btn-primary p-0 hstack justify-content-center feed-like" data-feedID="{$feedValue->id}" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Like">
+                                <i class="ti ti-thumb-up"></i>
+                            </a>
+                            <span class="text-dark fw-semibold">{$feedValue->likes}</span>
+                        </div>
+                        <div class="d-flex align-items-center gap-2 ms-4">
+                            <a class="$likedFeedsButtonClass round-32 rounded-circle btn btn-secondary p-0 hstack justify-content-center toggle-toggle-details-button" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Comment">
+                                <i class="ti ti-message-2"></i>
+                            </a>
+                            <span class="text-dark fw-semibold" id="feed-comments">$commentsCount</span>
+                        </div>
+                        <a class="text-dark ms-auto d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Share">
+                            <i class="ti ti-share"></i>
                         </a>
-                        <span class="text-dark fw-semibold">{$feedValue->likes}</span>
                     </div>
-                    <div class="d-flex align-items-center gap-2 ms-4">
-                        <a class="$likedFeedsButtonClass round-32 rounded-circle btn btn-secondary p-0 hstack justify-content-center" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Comment">
-                            <i class="ti ti-message-2"></i>
-                        </a>
-                        <span class="text-dark fw-semibold">$commentsCount</span>
-                    </div>
-                    <a class="text-dark ms-auto d-flex align-items-center justify-content-center bg-transparent p-2 fs-4 rounded-circle" href="javascript:void(0)" data-bs-toggle="tooltip" data-bs-placement="top" data-bs-title="Share">
-                        <i class="ti ti-share"></i>
-                    </a>
-                </div>
-                <div class="position-relative">
-                    $comments
+                <a href="javascript:void(0)" class="pe-auto p-0 toggle-details-button">Show more</a>
+                <div class="details d-none">
+                    <div class="position-relative">
+                        $commentCardsString
+                    </div>  
                 </div>
             </div>
             <form method="POST" class="d-flex align-items-center gap-6 flex-wrap p-3 flex-lg-nowrap">
@@ -492,15 +513,37 @@ $this->view("/includes/footer");
 ?>
 
 <script src="assets/js/apps/project.js"></script>
-<script src="assets/libs/select2/dist/js/select2.full.min.js"></script>
-<script src="assets/libs/select2/dist/js/select2.min.js"></script>
-<script src="assets/js/forms/select2.init.js"></script>
-<script defer>
-    $(".select2").select2({
-        placeholder: "Select Team member",
-        allowClear: true,
-        closeOnSelect: false
-    });
-</script>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.7/dist/sweetalert2.all.min.js" defer></script>
 <script src="assets/js/apps/project.js" defer></script>
+
+<!-- Show More Button -->
+<script defer>
+// function toggleDetails(button) {
+//     const details = button.nextElementSibling;
+//     if (details.hasClass('d-none')) {
+//         details.removeClass('d-none');
+//         $(this).text('Show less');
+//     } else {
+//         details.addClass('d-none');
+//         $(this).text('Show more');
+//     }
+// }
+
+$(document).ready(function() {
+
+    $('.toggle-toggle-details-button').click(function() {
+        $('.toggle-details-button').trigger('click');
+    });
+
+    $('.toggle-details-button').click(function() {
+        var details = $(this).siblings('.details');
+        if (details.hasClass('d-none')) {
+            details.removeClass('d-none');
+            $(this).text('Show less');
+        } else {
+            details.addClass('d-none');
+            $(this).text('Show more');
+        }
+    });
+});
+</script>

@@ -1,15 +1,4 @@
 $(function () {
-  // // Function to hide the element
-  // Copied to theme.js
-  // function hideElement(className) {
-  //   var elements = document.querySelectorAll(className);
-  //   if (elements) {
-  //     elements.forEach(element => {
-  //       console.log("Here" + element);
-  //       element.classList.remove("show");
-  //     });
-  //   }
-  // }
 
   function checkall(clickchk, relChkbox) {
     var checker = $("#" + clickchk);
@@ -40,6 +29,7 @@ $(function () {
   });
 
   function deleteTeam() {
+    $(".delete").off("click");
     $(".delete").on("click", function (event) {
       event.preventDefault();
       // Get Parents
@@ -86,6 +76,7 @@ $(function () {
   }
 
   function addTeam() {
+    $("#btn-add").off("click");
     $("#btn-add").click(function () {
       var getParent = $(this).parents(".modal-content");
 
@@ -126,7 +117,7 @@ $(function () {
           phone:$_phoneValue
         },
         success: function (response) {
-
+          console.log(response);
           var today = new Date();
           var dd = String(today.getDate()).padStart(2, "0");
           var mm = String(today.getMonth()); //January is 0!
@@ -164,6 +155,13 @@ $(function () {
           "</div>" +
           "</div>" +
           "</td>" +
+
+          "<td>"+
+              '<span class="badge bg-success-subtle text-danger fw-semibold fs-2 gap-1 d-inline-flex align-items-center">'+
+                  '<i class="ti ti-circle fs-3"></i>offline'+
+              '</span>'+
+          '</td>'+
+
           "<td>" +
           '<span class="usr-email-addr" data-email=' +
           $_emailValue +
@@ -187,11 +185,12 @@ $(function () {
           "</td>" +
           "</tr>";
 
-          $(".search-table > tbody >tr:first").before($html);
           
           if(response !== undefined)
             {  
+              $(".search-table > tbody >tr:first").before($html);
               document.body.insertAdjacentHTML("afterbegin", response.value);
+              deleteTeam();
             }
         },
         error: function (jqXHR, textStatus, errorThrown) {
@@ -212,7 +211,6 @@ $(function () {
 
       var $_setNameValueEmpty = $_name.val("");
       var $_setEmailValueEmpty = $_email.val("");
-      deleteTeam();
       checkall("team-member-check-all", "team-member-chkbox");
     });
   }
@@ -233,6 +231,8 @@ $(function () {
   });
 
   function editTeam() {
+    // Remove any previously attached event handlers
+  $(".edit").off("click");
     $(".edit").on("click", function (event) {
       $("#addTeamModal #btn-add").hide();
       $("#addTeamModal #btn-edit").show();
@@ -265,6 +265,7 @@ $(function () {
 
       $("#addTeamModal").modal("show");
 
+      $("#btn-edit").off("click");
       $("#btn-edit").click(function () {
         var getParent = $(this).parents(".modal-content");
 
@@ -292,16 +293,16 @@ $(function () {
           if(response !== undefined)
             {  
 
-              var setUpdatedNameValue = $_name.text($_nameValue);
-              var setUpdatedEmailValue = $_email.find('a').text($_emailValue);
-              var setUpdatedPhoneValue = $_phone.find('a').text($_phoneValue);
+              $_name.text($_nameValue);
+              $_email.find('a').text($_emailValue);
+              $_phone.find('a').text($_phoneValue);
       
-              var setUpdatedAttrNameValue = $_name.attr("data-name", $_nameValue);
-              var setUpdatedAttrEmailValue = $_email.attr("data-email", $_emailValue);
-              var setUpdatedAttrPhoneValue = $_phone.attr("data-phone", $_phoneValue);
+              $_name.attr("data-name", $_nameValue);
+              $_email.attr("data-email", $_emailValue);
+              $_phone.attr("data-phone", $_phoneValue);
       
-              var setUpdatedAnchorEmailValue = $_email.find('a').attr("href", "mailto:"+$_emailValue);
-              var setUpdatedAnchorPhoneValue = $_phone.find('a').attr("href", "tel:"+$_phoneValue);
+              $_email.find('a').attr("href", "mailto:"+$_emailValue);
+              $_phone.find('a').attr("href", "tel:"+$_phoneValue);
 
               document.body.insertAdjacentHTML("afterbegin", response.value);
               hideElement(".toast.show");

@@ -14,22 +14,19 @@ class Projects extends Controller
 
         $projectUserMap = new Project();
         $projectUserMap->table = "map_users_projects";
-        
-        $statusDB = new Project();
-        $statusDB->table = "projects_status";
-
-        $status = $statusDB->findAll();
         $projects = array();
+
+        $allStatus = $projectDB->getAllStatus();
 
         if(Auth::getRole() === 'admin'){
 
-            $projects = $projectDB->query("SELECT p.*, count(mup.fk_user_id) as membersCount FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE p.fk_company_id = :company_id GROUP BY p.id",["company_id" => Auth::getFk_company_id()]);
+            $projects = $projectDB->query("SELECT p.*, count(mup.fk_user_id) as membersCount FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE p.fk_company_id = :company_id GROUP BY p.id  ORDER BY FIELD(p.priority, 'High', 'Medium', 'Low'), end_date",["company_id" => Auth::getFk_company_id()]);
            
         }
 
         if(Auth::getRole() === 'employee' || Auth::getRole() === 'client'){
 
-                $projects = $projectDB->query("SELECT p.*, count(mup.fk_user_id) as membersCount FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :user_id GROUP BY p.id",["user_id" => Auth::getId()]);
+                $projects = $projectDB->query("SELECT p.*, count(mup.fk_user_id) as membersCount FROM projects as p INNER JOIN map_users_projects as mup ON p.id = mup.fk_project_id WHERE mup.fk_user_id = :user_id GROUP BY p.id  ORDER BY FIELD(p.priority, 'High', 'Medium', 'Low'), end_date",["user_id" => Auth::getId()]);
 
         }
 
@@ -49,7 +46,7 @@ class Projects extends Controller
                     $commentDB = new Comment();
                     $invitationDB = new Invitation();
 
-                    if (($projectDB->delete($_POST["projectID"], "id") !== null) && 
+                    if (($projectDB->delete($_POST["projectID"]) !== null) && 
                     ($projectUserMap->delete($_POST["projectID"], "fk_project_id") !== null) &&
                     ($feedDB->delete($_POST["projectID"], "fk_project_id") !== null)&&
                     ($documentDB->delete($_POST["projectID"], "fk_project_id") !== null)&&
@@ -83,7 +80,7 @@ class Projects extends Controller
         $this->view("projects", [
             'projectClass' => $projectDB,
             'projects' => $projects,
-            'status'=>$status,
+            'allStatus' => $allStatus,
             "errors" => $this->errors
         ]);
     }
@@ -97,6 +94,12 @@ class Projects extends Controller
         }
         $user = new User();
         $teamMembers = $user->where('fk_company_id', Auth::getFk_company_id());
+        $teamMembers = array_map(function($obj){
+          if($obj->role !== 'client')
+            return $obj;  
+        },$teamMembers);
+
+        $teamMembers = array_filter($teamMembers);
         $teamMembersRow = "";
         foreach ($teamMembers as $key => $value) {
             $teamMembersRow .= '<option value="' . $teamMembers[$key]->id . '">' . $teamMembers[$key]->name . '</option>';
@@ -217,10 +220,17 @@ class Projects extends Controller
 
                 try {
 
-                    if(!$invitations->uniqueValue('email', $email)){
-                        new Toast("We have already sent an invitation to this email address.", 999);
-                        echo "Fail invitation sent";
-                        exit();
+                    if(!$invitations->uniqueValue(['email','fk_company_id','fk_project_id'], [$email, Auth::getFk_company_id(), Auth::getFk_project_id()])){
+                        
+                        $invitationDatas = $invitations->where(['email','fk_company_id','fk_project_id'], [$email, Auth::getFk_company_id(), Auth::getFk_project_id()]);
+                        foreach ($invitationDatas as $key => $value) {
+                            if($value->expires_at > date('Y-m-d H:i:s')){
+                                http_response_code(400); 
+                                new Toast("We have already sent an invitation to this email address.");
+                                echo json_encode(['value' => Toast::show("show toast-onload"), 'code' => 999]);
+                                exit();
+                            }
+                        }
                     }
                     
 
@@ -306,11 +316,6 @@ class Projects extends Controller
             if(isset($_POST['add-feed'])){
                 $feed = new Feed();
 
-                if(!isset($_POST)){
-                    new Toast("Not found POST datas");
-                    exit();
-                }
-
                 $_POST['message'] = htmlspecialchars($_POST['message']);
                 $_POST['fk_parent_id'] = -1;
                 $_POST['fk_user_id'] = Auth::getId();
@@ -329,17 +334,18 @@ class Projects extends Controller
                         // If not, create the directory
                         mkdir('uploads/feed/documents', 0777, true);
                     }
-                    $fileName = $_FILES['file_name']['name'];
+                    $fileName = $_FILES['file_name']['name'] . '-' . mt_rand(10000000, 99999999);
                     $fileType = $_FILES['file_name']['type'];
-                    copy($_FILES['file_name']['tmp_name'], 'uploads/feed/documents' . DIRECTORY_SEPARATOR . $_FILES['file_name']['name']);
+                    $path = 'uploads/feed/documents';
+                    copy($_FILES['file_name']['tmp_name'], $path  . DIRECTORY_SEPARATOR . $_FILES['file_name']['name']);
                 }
                 if(strlen($_FILES['image_name']['tmp_name'])){
                     if (!file_exists('uploads/feed/images')) {
                         // If not, create the directory
                         mkdir('uploads/feed/images', 0777, true);
                     }
-                    $fileName = isset($_FILES['image_name']) ? add_webp_image('uploads/feed/images',$_FILES['image_name']['name'], $_FILES['image_name']['tmp_name']):"";
-
+                    $path = 'uploads/feed/images';
+                    $fileName = isset($_FILES['image_name']) ? add_webp_image($path,$_FILES['image_name']['name'], $_FILES['image_name']['tmp_name']):"";
                     $fileType = $_FILES['image_name']['type'];
                 }
 
@@ -347,6 +353,7 @@ class Projects extends Controller
                 if(isset($fileName)){
                     $_POST['name'] = $fileName;
                     $_POST['type'] = $fileType;
+                    $_POST['path'] = $path;
 
                     $document = new Document();
                     if(count($document->insert($_POST))){
@@ -376,8 +383,10 @@ class Projects extends Controller
                     new Toast("The comment could not be posted");
                     exit();
                 }
+                $lastCommentId = $comment->last_inserted_id();
                 if(isset($_POST['returnForAjaxRequest'])){
-                    echo json_encode(['userImage' => Auth::getImage(), 'userName' => Auth::getName()]);
+                    $toast = new Toast("Comment posted!");
+                    echo json_encode(['lastCommentId' => $lastCommentId, 'userImage' => Auth::getImage(), 'userName' => Auth::getName(), 'toast' => $toast->show()]);
                     exit();
                 }
 
@@ -482,6 +491,8 @@ class Projects extends Controller
 
                 $projectDB->update($projectDetails->id, ['fk_status_id' => $_GET['status-id']] );
                 new Toast('Project status saved!');
+                if(isset($_GET['allprojects']))
+                    $this->redirect('projects');
             }
         }
 
@@ -497,15 +508,30 @@ class Projects extends Controller
         // This is for progress bar
         $startDate = new DateTime($projectDetails->start_date);
         $endDate = new DateTime($projectDetails->end_date);
+
         $now = new DateTime('now');
         
         $projectInterval = $endDate->diff($startDate);
         $months = $projectInterval->m . " Months " . $projectInterval->d. " d";
-
+        $remainedDays = $now->diff($endDate);
         $elapsedDays = $now->diff($startDate);
-        $elapsedDaysString = $endDate > $now ? "Elapsed time ".$elapsedDays->days . " Days " . $elapsedDays->h. " h" : "Time expired";
 
-        $progressPercantege = round(($elapsedDays->days * 100) / $projectInterval->days, 2);
+        $remainedDaysString = "";
+
+        if($now <= $endDate){
+            if ($remainedDays->d > 0) {
+                $remainedDaysString .= strval($remainedDays->days + 1) . " days";
+            }
+            if($remainedDays->d == 0){
+                $remainedDaysString .= '<span class="bg-warning-subtle text-warning p-2 round rounded"> Last day </span>';
+            }
+        }
+        
+        if(!strlen($remainedDaysString))
+            $remainedDaysString = '<span class="bg-danger-subtle text-danger p-2 round rounded"> Times expired </span>';
+
+
+        $progressPercantege = $projectInterval->days > 0 ? round(($elapsedDays->days * 100) / $projectInterval->days) : 0;
         $projectInterval = $endDate->diff($startDate);
 
         // GET the company members;
@@ -545,13 +571,16 @@ class Projects extends Controller
         foreach ($teamIDS as $key => $value) {
             array_push($teamMembers, $user->where('id', $value)[0]);
         }
+        
+        $feedNumbers = ($feedDB->where('fk_project_id', $projectDetails->id)) ? count($feedDB->where('fk_project_id', $projectDetails->id)) : 0;
+
 
         $this->view("project", [
             'teamMembers' => $teamMembers,
             'projectWorkers' => $projectWorkersRow,
             'progressPercantege'=>$progressPercantege,
             'months' => $months,
-            'elapsedDays' => $elapsedDaysString,
+            'remainedDays' => $remainedDaysString,
             'teamLead' => $teamLead,
             'projectDetails' => $projectDetails,
             'feedDetails' => $feedDetails,
@@ -560,7 +589,8 @@ class Projects extends Controller
             'documentDetails' => $documentDetails,
             'slug' => $slug,
             'projectStatus' => $projectStatus,
-            'allStatus' => $allStatus
+            'allStatus' => $allStatus,
+            'feedNumbers' => $feedNumbers
         ]);
     }
 
@@ -571,14 +601,23 @@ class Projects extends Controller
         $projectDetails = $projectDB->where('slug', $slug)[0];
 
         $user = new User();
-        $companyMembers = $user->where('fk_company_id', Auth::getFk_company_id());
+        $companyMembersAndClients = $user->where('fk_company_id', Auth::getFk_company_id());
+        
+        $companyMembersAndClients = array_map(function($obj){
+            if($obj->role !== 'client')
+              return $obj;  
+          },$companyMembersAndClients);
+          
+        $companyMembersAndClients = array_filter($companyMembersAndClients);
+
         $teamLeaderRow = "";
-        foreach ($companyMembers as $key => $value) {
-            $selected = $companyMembers[$key]->id == $projectDetails->fk_teamlead_id ? "selected" : "";
-            $teamLeaderRow .= '<option value="' . $companyMembers[$key]->id . '" '.$selected.'>' . $companyMembers[$key]->name . '</option>';
+        foreach ($companyMembersAndClients as $key => $value) {
+            $selected = $companyMembersAndClients[$key]->id == $projectDetails->fk_teamlead_id ? "selected" : "";
+            $teamLeaderRow .= '<option value="' . $companyMembersAndClients[$key]->id . '" '.$selected.'>' . $companyMembersAndClients[$key]->name . '</option>';
         }
 
         
+        $companyMembers = $user->where('fk_company_id', Auth::getFk_company_id());
         $projectUserMap = new Project();
         $projectUserMap->table = "map_users_projects";
         $projectTeam = $projectUserMap->where('fk_project_id', $projectDetails->id);
@@ -611,11 +650,6 @@ class Projects extends Controller
 
                 $projectId = $project->where('slug', $slug)[0]->id;
 
-                // if(!count($projectStatus->where('id', 1)))
-                //     $projectStatus->insert(['id' => 1, 'name' => 'ready', 'priority' => 9999, 'active' => 1]);
-
-                // $_POST['fk_status_id'] = 1;
-
                 new Toast("The project was successfully saved", "");
                 if (count($project->update($projectId, $_POST)))
                     new Toast("The project could not be saved", "Try again later");
@@ -634,13 +668,17 @@ class Projects extends Controller
                         $projectUserMap->delete($projectId, 'fk_project_id');
                     }
                 }
-                $this->redirect("projects/single/" . $slug);
-                exit();
+                
+                if(isset($_POST['backto-all-projects'])){
+                    $this->redirect('projects');
+                }else{
+                    $this->redirect("projects/single/" . $slug);
+                    exit();
+                }
             }
 
             $this->errors = $project->errors;
         }
-
 
         $this->view("project-edit",[
             'errors' => $this->errors,
@@ -651,6 +689,46 @@ class Projects extends Controller
         
     }
 
+    public function statuses(){
+
+        $status = new Project();
+        $allStatus = "";
+        if($_SERVER['REQUEST_METHOD'] === 'POST'){
+            if(isset($_POST['add'])){
+                $status->addStatus([
+                    'name' => $_POST['name'],
+                    'color' => $_POST['color'],
+                    'priority' => $_POST['priority'],
+                    'active' => $_POST['active']
+                ]);
+
+                Toast::setToast("Status created!", "");
+                echo json_encode(['value' => Toast::show("show toast-onload")]);
+                exit();
+            }
+            // echo $_POST['active'];
+            if(isset($_POST['edit'])){
+                $status->updateStatus($_POST['statusId'], [
+                    'name' => $_POST['name'],
+                    'color' => $_POST['color'],
+                    'priority' => $_POST['priority'],
+                    'active' => $_POST['active']
+                ]);
+
+                Toast::setToast("Status saved!", "");
+                echo json_encode(['value' => Toast::show("show toast-onload")]);
+                exit();
+            }
+        }else{
+            $allStatus = $status->getAllStatusForTableDisplay();
+        }
+
+        $this->view("statuses", [
+            'allStatus' => $allStatus,
+            "errors" => $this->errors
+        ]);
+    }
+
     // ALL projects from the company
     public function getAdminProjects(){
         $authProjects = array();
@@ -659,6 +737,8 @@ class Projects extends Controller
             return $authProjects;
     
     }
+
+    // Authenticated User projects 
     public function getAuthProjects(){
         $authProjects = array();
         $projects = new Project();

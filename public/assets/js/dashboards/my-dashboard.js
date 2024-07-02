@@ -1,6 +1,6 @@
 document.addEventListener("DOMContentLoaded", function () {
     // -----------------------------------------------------------------------
-  // Total Income
+  // Total Projects
   // -----------------------------------------------------------------------
   if(document.querySelector("#total-projects")){
     
@@ -82,64 +82,6 @@ document.addEventListener("DOMContentLoaded", function () {
       options_line
     );
     chart_line_basic.render();
-
-  // =====================================
-  // Your Preformance
-  // =====================================
-
-  var options = {
-    series: [33, 33, 33],
-    labels: ["64", "4", "355"],
-    chart: {
-      height: 180,
-      fontFamily: "inherit",
-      type: "donut",
-    },
-    plotOptions: {
-      pie: {
-        startAngle: -90,
-        endAngle: 90,
-        offsetY: 10,
-        donut: {
-          size: "90%",
-        },
-      },
-    },
-    grid: {
-      padding: {
-        bottom: -80,
-      },
-    },
-    legend: {
-      show: false,
-    },
-    dataLabels: {
-      enabled: false,
-      name: {
-        show: false,
-      },
-    },
-    stroke: {
-      width: 2,
-      colors: "var(--bs-card-bg)",
-    },
-    tooltip: {
-      fillSeriesColor: false,
-    },
-    colors: [
-      "var(--bs-danger)",
-      "var(--bs-warning)",
-      "var(--bs-warning-bg-subtle)",
-      "var(--bs-secondary-bg-subtle)",
-      "var(--bs-secondary)",
-    ],
-  };
-
-  var chart = new ApexCharts(
-    document.querySelector("#your-preformance"),
-    options
-  );
-  chart.render();
 
 }
 });

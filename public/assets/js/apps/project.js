@@ -185,13 +185,17 @@ $(function () {
           },
           success: function (response) {
             if (response !== undefined) {
-              console.log(response);
               response = JSON.parse(response);
+              console.log(response);
+
               var appendNewComment = getParent.closest(".replyBox");
               getParent.remove();
 
               let newCommentHtml =
-                '<div class="p-4 rounded-2 text-bg-light mb-3 ms-7">' +
+                '<div class="p-4 rounded-2 text-bg-light mb-3 ms-7 replyBox position-relative" id="'+response["lastCommentId"]+'">' +
+                '<a href="javascript:void(0)" class="text-danger delete ms-2 position-absolute end-0 top-0 mt-3 me-3">'+
+                '<i class="ti ti-trash fs-5"></i>'+
+                '</a>'+
                 '<div class="d-flex align-items-center gap-6 flex-wrap">' +
                 '<img src="' +
                 response["userImage"] +
@@ -215,7 +219,13 @@ $(function () {
                 "</div>" +
                 "</div>";
 
+              replyCounter = appendNewComment.find('#comment-comments');
+              replyCounter.text(parseInt(replyCounter.text(), 10) + 1);
+
+              console.log(replyCounter);
               appendNewComment.after(newCommentHtml);
+              toast = response["toast"];
+              document.body.insertAdjacentHTML("afterbegin", toast);
               // document.location.reload();
             }
           },

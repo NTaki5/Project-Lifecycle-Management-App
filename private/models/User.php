@@ -3,7 +3,7 @@
 class User extends Model
 {
 
-    protected $allowedColumns = ["username","email", "phone", "facebook", "instagram", "youtube", "password", "name", "birthday", "companyName", "companyCUI", "companyAddress", "companyType", "date", "role","occupation",  "fk_company_id", "image", "avatar"];
+    protected $allowedColumns = ["username","online", "email", "phone", "facebook", "instagram", "youtube", "password", "name", "birthday", "companyName", "companyCUI", "companyAddress", "companyType", "date", "role","occupation",  "fk_company_id", "image", "avatar"];
 
     // functions before insert the data in DB
     protected $beforeInsert = ["hash_password"];
@@ -136,11 +136,34 @@ class User extends Model
     public function showInTeamTable(){
 
         $tableRows = "";
-        $users = $this->where('fk_company_id',Auth::getFk_company_id());
-        rsort($users);
+        $users = $this->findAll('fk_company_id = '.Auth::getFk_company_id(), orderby: 'online DESC, name ASC');
+        // rsort($users);
+
+        $actionBtns = "";
+        if(strtolower(Auth::getRole()) === 'admin'){
+            $actionBtns = <<<DELIMETER
+            <div class="action-btn">
+                <a href="javascript:void(0)" class="text-primary edit">
+                    <i class="ti ti-eye fs-5"></i>
+                </a>
+                <a href="javascript:void(0)" class="text-dark delete ms-2">
+                    <i class="ti ti-trash fs-5"></i>
+                </a>
+            </div>
+DELIMETER;
+        }
 
         foreach ($users as $key => $value) {
             
+            $status =  "offline";
+            $textColorClass = "text-danger";
+
+            if($value->online){
+                $status =  "online";
+                $textColorClass = "text-success";
+            }
+            
+
             $image = 
             (strlen($users[$key]->image) && file_exists('uploads/users/' . $users[$key]->image)) ?
             'uploads/users/' . $users[$key]->image :
@@ -150,21 +173,8 @@ class User extends Model
             $userRole = strtolower($users[$key]->role) === 'admin' ? ucfirst($users[$key]->role) : ucfirst($users[$key]->occupation);
             $userRole .= $users[$key]->id === Auth::getId() ? "( Me )" : "";
 
-            $actionBtns = "";
-            if(strtolower(Auth::getRole()) === 'admin'){
-                $actionBtns = <<<DELIMETER
-                <div class="action-btn">
-                    <a href="javascript:void(0)" class="text-primary edit">
-                        <i class="ti ti-eye fs-5"></i>
-                    </a>
-                    <a href="javascript:void(0)" class="text-dark delete ms-2">
-                        <i class="ti ti-trash fs-5"></i>
-                    </a>
-                </div>
-DELIMETER;
-            }
-
-            if((strtolower(Auth::getRole()) === 'employee') && ($users[$key]->id === Auth::getId())){
+            // employees can only edit their own data
+            if(((strtolower(Auth::getRole()) !== 'admin') && (strtolower(Auth::getRole()) === 'employee')) && ($users[$key]->id === Auth::getId())){
                 $actionBtns = <<<DELIMETER
                 <div class="action-btn">
                     <a href="javascript:void(0)" class="text-primary edit">
@@ -199,8 +209,8 @@ DELIMETER;
                         </div>
                     </td>
                     <td>
-                        <span class="badge bg-success-subtle text-success fw-semibold fs-2 gap-1 d-inline-flex align-items-center">
-                            <i class="ti ti-circle fs-3"></i>online
+                        <span class="badge bg-success-subtle $textColorClass fw-semibold fs-2 gap-1 d-inline-flex align-items-center">
+                            <i class="ti ti-circle fs-3"></i>$status
                         </span>
                     </td>
                     <td>
