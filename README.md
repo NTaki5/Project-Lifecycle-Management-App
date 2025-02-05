@@ -2,7 +2,7 @@ Final Exam
 
 The application provides an interface that allows registered companies to create projects and invite relevant clients to the platform. This creates a "room" between the company and the client, facilitating communication, document storage, and customer service processes.
 
-It is a web-based application, accessible to anyone without the need to download anything. Suggested technologies: PHP, HTML5, SQL DB.
+It is a web-based application, accessible to anyone without the need to download anything. Suggested technologies: PHP, HTML5, SQL DB, CSS.
 
 The system is divided into two main modules from a logical perspective: Company Module and Client Module.
 
@@ -21,6 +21,7 @@ The project has a news feed section where both company employees and the client 
 The project allows uploading of necessary documents: contracts, attachments, branding guidelines, quotes, invoices, account statement extracts, and other documents. PDF and image files can be opened with a click, while other documents can be downloaded.
 Company employees can view bugs created by the client in a to-do list format, with a status, priority, and an optional deadline.
 Company employees can update the status of a task: in progress/completed, etc.
+
 Client Module
 
 The client can activate their account based on the instructions in the email invitation.
