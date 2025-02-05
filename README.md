@@ -1,30 +1,31 @@
-Final Exam
+# Project-Lifecycle-Management-App
+State exam
 
-The application provides an interface that allows registered companies to create projects and invite relevant clients to the platform. This creates a "room" between the company and the client, facilitating communication, document storage, and customer service processes.
+The application is an interface that allows registered companies to create projects and invite clients belonging to the project to the interface. This creates a “room” between the company and the client, which facilitates communication, storage of relevant documents and customer service processes.
 
-It is a web-based application, accessible to anyone without the need to download anything. Suggested technologies: PHP, HTML5, SQL DB, CSS.
+It is a web-based application, so that it is accessible to anyone without having to download anything. Recommended technologies: PHP, HTML5, SQL DB.
 
-The system is divided into two main modules from a logical perspective: Company Module and Client Module.
+The system is divided into two large parts from a logical point of view: **Company module and client module**.
 
-Feature List
+**Function list**
 
-Company Module
+**Company module**
 
-A company can register on the platform by filling out the required company information.
-Upon company registration, an Admin user is created, who can log in to the application anytime using their email and password.
-Users have a "Forgot Password" option, allowing them to reset their password.
-After logging in, the admin user sees a "Dashboard" displaying the most relevant information, such as projects, users, and news.
-The admin user can invite colleagues to the platform. They will receive an email notification to activate their accounts and log in.
-The company admin can create projects by specifying the project name, duration, and selecting relevant team members.
-The company admin can send an invitation to a client for an existing project, which creates the "room" between the company and the client.
-The project has a news feed section where both company employees and the client can open a specific discussion thread to communicate via comments.
-The project allows uploading of necessary documents: contracts, attachments, branding guidelines, quotes, invoices, account statement extracts, and other documents. PDF and image files can be opened with a click, while other documents can be downloaded.
-Company employees can view bugs created by the client in a to-do list format, with a status, priority, and an optional deadline.
-Company employees can update the status of a task: in progress/completed, etc.
+A company can register on the platform if it uploads the required company data.
+When registering a company, an Admin user is also created, who can then log in to the application at any time based on their email address and password
+Users also have a “Forgot my password” option, through which they can reset their password
+After logging in, the admin user sees a “Dashboard” with the most relevant information, such as projects, users, news
+The admin user can invite colleagues to the interface, who can activate their users via an email notification and log in.
+The company admin can create projects, giving them a name, duration and selecting relevant colleagues for the project.
+The company admin can send an invitation to a created project to the client and from there a “room” is created between the company and the client
+The project has a news feed section where both the company’s employees and the client can open a certain discussion topic, under which users can communicate in the form of comments
+The necessary documents can be uploaded to the project: contracts, attachments, corporate manuals, quotes, invoices, account statements and other documents. PDF and image documents can be opened with a click, and the rest can be downloaded.
+The company’s employees can see the bugs created by the client in the form of a to-do list with a status and a priority and an optional deadline
+The company’s employees can change the status of the task: in progress/completed, etc.
 
-Client Module
+**Client module**
 
-The client can activate their account based on the instructions in the email invitation.
-After logging in, the client can view the projects they have been added to on the platform.
-The client can enter the internal page of a project, where they can access all project-related information, upload and access documents, open new topics, and create tasks.
-The client can create new feature requests or bugs within a project, which will appear in a list view for company employees. When a new document is uploaded or a new task is created, the project members receive an email notification.
+The client can activate his user based on the instructions in the email invitation
+After logging in, the client can view the projects to which he has been added via the interface
+The client can enter the internal page of a project, where he can access all information about the project, access and upload documents, open new topics and create tasks
+The client can create new feature requests or bugs within a project, which will then appear in a list view for the company's employees. When a new document is uploaded or a new task is created, the project members are notified by email.
